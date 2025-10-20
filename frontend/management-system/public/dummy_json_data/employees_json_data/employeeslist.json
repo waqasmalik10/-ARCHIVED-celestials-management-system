@@ -1,0 +1,24 @@
+{
+    "employeesList": [
+        {
+            "id": 1,
+            "name": "Anas",
+            "status": "Active"
+        },
+        {
+            "id": 2,
+            "name": "Jhon",
+            "status": "In-active"
+        },
+        {
+            "id": 3,
+            "name": "Abc",
+            "status": "Active"
+        },
+        {
+            "id": 4,
+            "name": "DEF",
+            "status": "In-active"
+        }
+    ]
+}

@@ -1,32 +1,36 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import Dashboard from "../pages/Dashboard";
+import RegisterEmployeesPage from "../pages/RegisterEmployeesPage";
 import Setting from "../pages/Settings";
+import EmployeesPage from "../pages/EmployeesPage";
 
 interface UserPageProps {
   name: string;
-  admin: boolean;
+  superAdmin: boolean;
 }
 
-export default function UserPage({admin}: UserPageProps) {
+export default function UserPage({ superAdmin }: UserPageProps) {
   return (
     <>
       <Routes>
-        {/* {!admin && (
+        {/* {!superAdmin && (
           <>
             <Route path="/" element={<Navigate to="/dashboard" />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/" element={<Dashboard />} />
           </>
         )} */}
-        <Route path="/" element={<Navigate to="/dashboard" />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/employees" element={<EmployeesPage />} /> 
+        <Route path="/employees/register-employees" element={<RegisterEmployeesPage />} />
+
         <Route path="/settings" element={<Setting />} />
       </Routes>
 
-      {/* {admin ? (
+      {/* {superAdmin ? (
         <>
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/" element={<Dashboard />} />
           </Routes>
         </>
       ) : null} */}

@@ -15,7 +15,7 @@ import ImageButton from "../shared/ImageButton";
 
 interface SideBarProps {
   pathTitle?: string | undefined;
-  admin?: boolean;
+  superAdmin?: boolean;
   name?: string;
   sidebarEmail?: string;
   sideBarLogout?: () => void;
@@ -34,7 +34,7 @@ export default function SideBar(props: SideBarProps) {
 
   const navigate = useNavigate();
 
-  console.log(props.admin, "admin")
+  console.log(props.superAdmin, "super-admin")
 
   useEffect(() => {
     setIsLoaded(true);
@@ -43,7 +43,7 @@ export default function SideBar(props: SideBarProps) {
   const activeClass = "selectedSideBarOption !font-semibold";
 
   useEffect(() => {
-    if (location.pathname === "/dashboard") {
+    if (location.pathname === "/") {
       setActiveDashboard(true);
       setActiveSettings(false);
       setActiveEmployees(false);
@@ -117,7 +117,7 @@ export default function SideBar(props: SideBarProps) {
   }, [location.pathname]);
 
   const navigateDashboard = () => {
-    navigate("/dashboard");
+    navigate("/");
   };
   function navigateSetting() {
     navigate("/settings");
@@ -155,14 +155,14 @@ export default function SideBar(props: SideBarProps) {
       icon: employeesIcon,
       onClick: navigateEmployees,
       active: activeEmpoyees,
-      show: props.admin,
+      show: props.superAdmin,
     },
     {
       label: "Departments",
       icon: departmentsIcon,
       onClick: navigateDepartments,
       active: activeDepartments,
-      show: props.admin,
+      show: props.superAdmin,
     },
     {
       label: "Liquidity",

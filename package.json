@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "formik": "^2.4.6",
-    "framer-motion": "^12.23.24"
-  }
-}

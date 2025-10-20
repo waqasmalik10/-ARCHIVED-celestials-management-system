@@ -1,3 +1,5 @@
+import { JSX } from "react/jsx-runtime";
+
 export interface Card {
   image: string;
   amount: string;
@@ -93,6 +95,16 @@ export interface TransactionData {
   transactionTableData: TransactionTableData[];
 }
 
+export interface EmployeeTableData {
+  name: string;
+  status: string;
+}
+
+export interface EmployeeListData {
+  employeesList: EmployeeTableData[]
+}
+
+
 export const fetchCardData = async (): Promise<CardData> => {
   try {
     const response = await fetch(
@@ -179,6 +191,22 @@ export const fetchTransactionData = async (): Promise<TransactionData> => {
   try {
     const response = await fetch(
       "/dummy_json_data/dashboard_json_data/transaction_data.json"
+    );
+    if (!response.ok) {
+      throw new Error(`${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const fetchEmploeeTableData = async (): Promise<EmployeeListData> => {
+  try {
+    const response = await fetch(
+      "/dummy_json_data/dashboard_json_data/dashboard-superadmin-json_data/employeelist.json"
     );
     if (!response.ok) {
       throw new Error(`${response.status}`);

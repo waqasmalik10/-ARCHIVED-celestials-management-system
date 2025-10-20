@@ -1,1 +1,0 @@
-# celestials-management-system

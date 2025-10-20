@@ -26,7 +26,7 @@ export type AppUser = BaseUser &
 export const VerifyContext = createContext<{
   user: AppUser | null;
   authCheckLoading: boolean;
-  admin: boolean;
+  superAdmin: boolean;
   setUser: (user: AppUser | null) => void;
   loginUser: (
     email: string,
@@ -36,7 +36,7 @@ export const VerifyContext = createContext<{
 }>({
   user: null,
   setUser: () => {},
-  admin: false,
+  superAdmin: false,
   loginUser: async () => ({ success: false }),
   authCheckLoading: false,
 });
@@ -47,10 +47,9 @@ export const VerifyContextProvider = ({
   children: ReactNode;
 }) => {
   const [user, setUser] = useState<AppUser | null>(null);
-  // const [admin, setAdmin] = useState(false);
   const [authCheckLoading, setAuthCheckLoading] = useState(true);
 
-  const admin = user?.name === "Celestial";
+  const superAdmin = user?.name === "Celestial";
 
   const loginUser = async (
     email: string,
@@ -95,7 +94,7 @@ export const VerifyContextProvider = ({
 
   return (
     <VerifyContext.Provider
-      value={{ user, setUser, loginUser, admin, authCheckLoading }}
+      value={{ user, setUser, loginUser, superAdmin, authCheckLoading }}
     >
       {children}
     </VerifyContext.Provider>

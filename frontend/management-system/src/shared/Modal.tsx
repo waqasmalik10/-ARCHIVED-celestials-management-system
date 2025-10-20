@@ -23,13 +23,13 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(({
     <>
     <div
       onClick={onClick}
-      className={`${modalMain} h-full flex justify-center items-center flex bg-[#555894] px-4 bg-cover z-[999999] min-h-screen`}
+      className={`${modalMain} h-screen flex justify-center items-center flex bg-[#555894] px-4 bg-cover z-[999999]`}
       {...props}
     >
 
     <div
         ref={ref}
-        className={`${modalClassName} rounded-[20px] linerGradientBackgroundModal h-[calc(100%-10%)] modalBoxShadow overflowYAuto border-[1.26px] border-solid border-light-black rounded-xl w-full`}
+        className={` bodyBackground h-[calc(100%-40px)] modalBoxShadow overflowYAuto border border-solid border-[#FFFFFF21] w-full ${modalClassName}`}
       >
         {children}
       </div>

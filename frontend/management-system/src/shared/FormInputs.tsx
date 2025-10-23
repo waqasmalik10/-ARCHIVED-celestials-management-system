@@ -17,7 +17,7 @@ export default function FormInput({
       <label className={` ${labelClassName}`}>
         {label}
       </label>
-      <div className={`relative ${inputMainBorder}`}>
+      <div className={`relative w-full ${inputMainBorder}`}>
       <input
         {...props}
         className={`w-full outline-none ${inputClassName}`}

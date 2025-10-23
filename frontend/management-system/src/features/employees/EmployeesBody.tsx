@@ -2,11 +2,13 @@ import EmployeeTable from "./ui/EmployeeTable"
 import Button from "../../shared/Button"
 import { useNavigate } from "react-router-dom";
 import registerIcon from "../../assets/images/register.svg"
+import { useEmployees } from "./modal/EmployeesContext";
 
 const EmployeesBody = () => {
-
+    const {setEditingEmployee} = useEmployees()
     const navigate = useNavigate()
     const registerEmployee = () => {
+        setEditingEmployee(null)
         navigate("register-employees")
     }
     return (

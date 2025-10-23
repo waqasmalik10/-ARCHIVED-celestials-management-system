@@ -5,10 +5,12 @@ import Box from "../../../shared/Box";
 import useIntersectionObserver from "../../../shared/UseIntersectionObserver";
 import Button from "../../../shared/Button";
 import { useEmployees } from "../modal/EmployeesContext";
+import { useNavigate } from "react-router-dom";
 
 
 const EmployeeTable = () => {
-    const { employeesList } = useEmployees();
+    const { employeesList, editEmployeeData } = useEmployees();
+    const navigate = useNavigate();
 
     const [ref, isVisible] = useIntersectionObserver({ threshold: 0.1 }) as [
         React.RefObject<HTMLDivElement>,
@@ -21,6 +23,11 @@ const EmployeeTable = () => {
             setHasAnimated(true);
         }
     }, [isVisible, hasAnimated]);
+
+    const handleNameClick = (employee: EmployeeTableData) => {
+        editEmployeeData(employee);
+        navigate(`/employees/update-employees/${employee.id}`);
+    };
 
     console.log(employeesList)
 
@@ -54,9 +61,9 @@ const EmployeeTable = () => {
                                 >
                                     <td className="py-3 md:py-[19px] pl-10 w-[40%] flex items-center gap-4 md:gap-[29px]">
                                         <img src={ProfileImage} alt="Profile" className="sm:w-10 sm:h-10 w-[30px] h-[30px]" />
-                                        <p className="font-inter font-medium text-base sm:text-lg md:text-xl leading-normal text-white whitespace-nowrap">
+                                        <button onClick={() => handleNameClick(data)} className="font-inter font-medium text-base sm:text-lg md:text-xl leading-normal text-white whitespace-nowrap hover:underline">
                                             {data.name}
-                                        </p>
+                                        </button>
                                     </td>
                                     <td className="w-[30%] py-3 md:py-[19px]  pr-10 text-right">
                                         <div

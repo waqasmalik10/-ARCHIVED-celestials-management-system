@@ -1,6 +1,6 @@
 import FormInput from "../../../../shared/FormInputs";
 import FormButton from "../../../../shared/FormButton";
-import Modal from "../../../../shared/Modal";
+import AuthModal from "../../../../shared/AuthModal";
 import { useState, useContext } from "react";
 import { useFormik } from "formik";
 import { Link, useNavigate } from "react-router-dom";
@@ -65,7 +65,7 @@ export default function LoginPage() {
   });
 
   return (
-    <Modal modalClassName="max-w-[400px] mx-auto p-7 w-full max-h-fit rounded-[13px]">
+    <AuthModal modalClassName="max-w-[400px] mx-auto p-7 w-full max-h-fit rounded-[13px]">
       <h1 className="font-poppins text-xl md:text-2xl text-left leading-normal md:leading-[33.33px] font-semibold text-white m-0">
         Login
       </h1>
@@ -174,6 +174,6 @@ export default function LoginPage() {
           />
         </div>
       </form>
-    </Modal>
+    </AuthModal>
   );
 }

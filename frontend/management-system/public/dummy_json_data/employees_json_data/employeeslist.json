@@ -25,6 +25,7 @@
       "hobbies": "Football",
       "vehicleRegistrationNumber": "ABC-123",
       "companyId": "321",
+      "additionalRoles": "",
       "status": "Active"
     },
     {
@@ -52,6 +53,7 @@
       "hobbies": "Reading",
       "vehicleRegistrationNumber": "XYZ-789",
       "companyId": "322",
+      "additionalRoles": "",
       "status": "In-active"
     },
     {
@@ -79,6 +81,7 @@
       "hobbies": "Gaming",
       "vehicleRegistrationNumber": "LMN-456",
       "companyId": "323",
+      "additionalRoles": "",
       "status": "Active"
     },
     {
@@ -106,6 +109,7 @@
       "hobbies": "Painting",
       "vehicleRegistrationNumber": "DEF-321",
       "companyId": "324",
+      "additionalRoles": "HR",
       "status": "In-active"
     },
     {
@@ -133,6 +137,7 @@
       "hobbies": "Cycling",
       "vehicleRegistrationNumber": "GHI-654",
       "companyId": "325",
+      "additionalRoles": "Salary Management",
       "status": "Active"
     },
     {
@@ -160,6 +165,7 @@
       "hobbies": "Cooking",
       "vehicleRegistrationNumber": "JKL-987",
       "companyId": "326",
+      "additionalRoles": "",
       "status": "In-active"
     },
     {
@@ -187,10 +193,11 @@
       "hobbies": "Photography",
       "vehicleRegistrationNumber": "MNO-321",
       "companyId": "327",
+      "additionalRoles": "",
       "status": "Active"
     },
     {
-      "id": 8,
+      "id": "8",
       "name": "Bilal Ahmad",
       "bankName": "Ubl",
       "bankTitle": "Mr.",
@@ -214,6 +221,7 @@
       "hobbies": "Photography",
       "vehicleRegistrationNumber": "MNO-321",
       "companyId": "327",
+      "additionalRoles": "",
       "status": "Active"
     }
   ]

@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react"
 import ProfileImage from "../../../assets/images/profileIcon.svg"
-import { EmployeeTableData } from "../api/employees"
+import { EmployeeTableData } from "../modal/EmployeesContext"
 import Box from "../../../shared/Box";
 import useIntersectionObserver from "../../../shared/UseIntersectionObserver";
 import Button from "../../../shared/Button";
 import { useEmployees } from "../modal/EmployeesContext";
 import { useNavigate } from "react-router-dom";
+import StatusModal from "./StatusModal";
 
 
 const EmployeeTable = () => {
-    const { employeesList, editEmployeeData } = useEmployees();
+    const { employeesList } = useEmployees();
     const navigate = useNavigate();
+    const [isStatusModalOpen, setIsStatusModalOpen] = useState(false)
+
 
     const [ref, isVisible] = useIntersectionObserver({ threshold: 0.1 }) as [
         React.RefObject<HTMLDivElement>,
@@ -24,10 +27,16 @@ const EmployeeTable = () => {
         }
     }, [isVisible, hasAnimated]);
 
+
+
     const handleNameClick = (employee: EmployeeTableData) => {
-        editEmployeeData(employee);
-        navigate(`/employees/update-employees/${employee.id}`);
+        console.log(employee,)
+        navigate(`/employees/update-employees/${employee.id || ''}`);
     };
+
+    const statusModalOpen = () => {
+        setIsStatusModalOpen(!isStatusModalOpen)
+    }
 
     console.log(employeesList)
 
@@ -66,14 +75,14 @@ const EmployeeTable = () => {
                                         </button>
                                     </td>
                                     <td className="w-[30%] py-3 md:py-[19px]  pr-10 text-right">
-                                        <div
+                                        <button type="button" onClick={statusModalOpen}
                                             className={`rounded-[15px] ml-auto px-[15px] h-6 md:h-[30px] text-xs md:text-[15px] md:leading-6 font-medium font-inter pt-px flex items-center w-fit ${data.status === "In-active"
                                                 ? "text-[#FF8663] bg-[#FF866314]"
                                                 : "text-[#ADDC7B] bg-[#ADDC7B14]"
                                                 }`}
                                         >
                                             {data.status}
-                                        </div>
+                                        </button>
                                     </td>
                                     <td className="w-[30%] py-2.5 md:py-3.5  pr-10 text-right">
                                         <Button buttonClasses="bodyBackground px-4 py-3 font-inter font-medium text-base sm:text-lg md:text-xl leading-normal text-white whitespace-nowrap rounded-[15px]">
@@ -86,6 +95,9 @@ const EmployeeTable = () => {
                     </table>
                 </div>
             </Box>
+            {isStatusModalOpen && 
+                <StatusModal />
+            }
         </>
     )
 }

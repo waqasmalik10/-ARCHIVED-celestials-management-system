@@ -8,7 +8,7 @@ interface ModalProps {
   onClick?: () => void;
 }
 
-const Modal = React.forwardRef<HTMLDivElement, ModalProps>(({
+const AuthModal = React.forwardRef<HTMLDivElement, ModalProps>(({
   modalClassName,
   modalMain,
   children,
@@ -23,13 +23,13 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(({
     <>
     <div
       onClick={onClick}
-      className={`h-screen flex justify-center items-center bg-[#5558948f] px-4 bg-cover z-[999999] absolute top-0 w-full backdrop-blur-[7px] ${modalMain}`}
+      className={`${modalMain} h-screen flex justify-center items-center flex bg-[#555894] px-4 bg-cover z-[999999]`}
       {...props}
     >
 
     <div
         ref={ref}
-        className={`relative bodyBackground min-w-[500px] rounded-[15px] overflow-hidden transition-opacity duration-500 min-h-[200px] ${modalClassName}`}
+        className={` bodyBackground h-[calc(100%-40px)] modalBoxShadow overflowYAuto border border-solid border-[#FFFFFF21] w-full ${modalClassName}`}
       >
         {children}
       </div>
@@ -41,4 +41,4 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(({
   );
 });
 
-export default Modal;
+export default AuthModal;

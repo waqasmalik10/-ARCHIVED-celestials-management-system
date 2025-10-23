@@ -1,5 +1,5 @@
 export interface EmployeeTableData {
-  id?: number;
+  id?: string;
   name: string;
   status: string;
   date?: string;

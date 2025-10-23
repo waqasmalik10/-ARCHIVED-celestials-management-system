@@ -20,6 +20,7 @@ const formSchema = Yup.object().shape({
     employeeId: Yup.string().required("ID is required"),
     department: Yup.string().required("Department is required"),
     email: Yup.string().email("Invalid email").required("Email is required"),
+    password: Yup.string().required("Password is required"),
     cnic: Yup.string().required("CNIC is required"),
     designation: Yup.string().required("Designation is required"),
     team: Yup.string().required("Team is required"),
@@ -53,8 +54,9 @@ const Form = () => {
     const [bankName, setBankName] = useState(editingEmployee?.bankName || "Select the bank")
     const [departmentName, setDepartmentName] = useState(editingEmployee?.department || "Select the Department")
     const [teamName, setTeamName] = useState(editingEmployee?.team || "Select the team")
+
+
     const [generatedEmployeeId] = useState<string>(uuidv4());
-    const [isChecked, setIsChecked] = useState(false);
     console.log(generatedEmployeeId)
 
     const banksOptions = ["Meezan", "UBL", "Allied", "HBL"];
@@ -127,7 +129,7 @@ const Form = () => {
     };
 
     const handleSubmit = (values: any) => {
-        if (editingEmployee !== null && updateEmployee && editingEmployee) {
+        if (editingEmployee !== null && updateEmployee) {
             const updatedEmployee = {
                 ...editingEmployee,
                 ...values,
@@ -144,6 +146,7 @@ const Form = () => {
                 fullTimeJoinDate: values.fullTimeJoinDate as string,
                 status: 'Active',
                 email: values.email || '',
+                password: values.password || '',
                 cnic: values.cnic || '',
                 designation: values.designation || '',
                 team: values.team || '',
@@ -162,6 +165,7 @@ const Form = () => {
                 increamentAmount: values.increamentAmount || 0,
                 homeAddress: values.homeAddress || '',
                 image: values.image || '',
+                additionalRoles: values.additionalRoles.join(', ') || ''
             }
             const added = addEmployee(newEmployee);
             console.log(added)
@@ -182,12 +186,29 @@ const Form = () => {
         document.body.style.overflow = "auto"
     }
 
+    const [isEditClick, setIsEditClick] = useState(false);
+    const [isEditfullTimeJoin, setIsEditFullTimeJoin] = useState(false)
+    const [isEditDateOfBirth, setIsEditDateOfBirth] = useState(false)
+    const editCurrentBaseSalary = () => {
+        setIsEditClick(!isEditClick)
+    }
+
+    const editfullTimeJoinDate = () => {
+        setIsEditFullTimeJoin(!isEditfullTimeJoin)
+    }
+
+    const editDateOfBirth = () => {
+        setIsEditDateOfBirth(!isEditDateOfBirth)
+    }
+
+
     const formik = useFormik({
         initialValues: {
             name: editingEmployee?.name || "",
             employeeId: editingEmployee?.id || generatedEmployeeId,
             department: editingEmployee?.department || "",
             email: editingEmployee?.email || "",
+            password: editingEmployee?.password || "",
             cnic: editingEmployee?.cnic || "",
             designation: editingEmployee?.designation || "",
             team: editingEmployee?.team || "",
@@ -208,21 +229,25 @@ const Form = () => {
             status: editingEmployee?.status || "Active",
             date: editingEmployee?.date || "",
             fullTimeJoinDate: editingEmployee?.fullTimeJoinDate || "",
+            additionalRoles: editingEmployee?.additionalRoles ? editingEmployee.additionalRoles.split(',').map(role => role.trim()) : [],
         },
         validationSchema: formSchema,
         onSubmit: handleSubmit,
+        enableReinitialize: true,
     });
-    const [isEditClick, setIsEditClick] = useState(false);
-    const [isEditfullTimeJoin, setIsEditFullTimeJoin] = useState(false)
-    const editCurrentBaseSalary = () => {
-        setIsEditClick(true)
-    }
-    const editfullTimeJoinDate = () => {
-        setIsEditFullTimeJoin(true)
-    }
-    const handleCheckMark = () => {
-        setIsChecked(!isChecked);
-    };
+    useEffect(() => {
+        if (editingEmployee) {
+            setBankName(editingEmployee.bankName || "Select the bank")
+            setDepartmentName(editingEmployee.department || "Select the Department")
+            setTeamName(editingEmployee.team || "Select the Team")
+        }
+
+
+    }, [editingEmployee])
+  
+    console.log(formik.values.name, "Values")
+    console.log(editingEmployee?.name)
+
     return (
         <>
             <form onSubmit={formik.handleSubmit} noValidate className="mt-6 flex flex-col gap-[38px]">
@@ -300,6 +325,14 @@ const Form = () => {
                         {formik.errors.email && formik.touched.email && (
                             <p className={`${errorClasses}`}>
                                 {formik.errors.email}
+                            </p>
+                        )}
+                    </div>
+                    <div className="relative">
+                        <FormInput label="Password" name="password" type="text" value={formik.values.password} onChange={formik.handleChange} placeholder="Password" labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles}`} />
+                        {formik.errors.password && formik.touched.password && (
+                            <p className={`${errorClasses}`}>
+                                {formik.errors.password}
                             </p>
                         )}
                     </div>
@@ -415,7 +448,7 @@ const Form = () => {
                         )}
                     </div>
                     <div className="relative">
-                        <FormInput label="Date of Birth" name="dateOfBirth" type="date" value={formik.values.dateOfBirth} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles}`} />
+                        <FormInput label="Date of Birth" name="dateOfBirth" type="date" placeholder="mm/dd/yyyy" value={formik.values.dateOfBirth} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles} ${formik.values.dateOfBirth === "" ? "!text-[#747681]" : "!text-white"}`} />
                         {formik.errors.dateOfBirth && formik.touched.dateOfBirth && (
                             <p className={`${errorClasses}`}>
                                 {formik.errors.dateOfBirth}
@@ -423,7 +456,15 @@ const Form = () => {
                         )}
                     </div>
                     <div className="relative">
-                        <FormInput label="Actual Date of Birth" name="actualDateOfBirth" type="date" value={formik.values.actualDateOfBirth} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles}`} />
+                        {!isEditDateOfBirth ?
+                            <Button type="button" buttonClasses="absolute right-0 top-2.5 text-white text-sm" onClick={editDateOfBirth}>Edit</Button>
+                            :
+                            <Button type="button" buttonClasses="absolute right-0 top-2.5 text-white text-sm" onClick={editDateOfBirth}>Cancel</Button>
+                        }
+                        {isEditDateOfBirth ?
+                            <FormInput label="Actual Date of Birth" name="actualDateOfBirth" type="date" placeholder="mm/dd/yyyy" value={formik.values.actualDateOfBirth} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles} ${formik.values.actualDateOfBirth === "" ? "!text-[#747681]" : "!text-white"}`} /> :
+                            <FormInput label="Actual Date of Birth" name="actualDateOfBirth" type="date" placeholder="mm/dd/yyyy" value={formik.values.dateOfBirth} readOnly onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles} ${formik.values.dateOfBirth === "" ? "!text-[#747681]" : "!text-white"}`} />
+                        }
                         {formik.errors.actualDateOfBirth && formik.touched.actualDateOfBirth && (
                             <p className={`${errorClasses}`}>
                                 {formik.errors.actualDateOfBirth}
@@ -431,7 +472,18 @@ const Form = () => {
                         )}
                     </div>
                     <div className="relative">
-                        <FormInput label="Joining Date" name="date" type="date" value={formik.values.date} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles}`} />
+                        <FormInput
+                            label="Joining Date"
+                            name="date"
+                            type="date"
+                            placeholder="mm/dd/yyyy"
+                            value={formik.values.date}
+                            onChange={formik.handleChange}
+                            labelClassName={labelStyles}
+                            inputMainBorder={inputBorder}
+                            inputClassName={`${inputStyles} ${formik.values.date === "" ? "!text-[#747681]" : "!text-white"}`}
+                        />
+
                         {formik.errors.date && formik.touched.date && (
                             <p className={`${errorClasses}`}>
                                 {formik.errors.date}
@@ -439,17 +491,20 @@ const Form = () => {
                         )}
                     </div>
                     <div className="relative">
-                        <Button type="button" buttonClasses="absolute right-0 top-2.5 text-white text-sm" onClick={editfullTimeJoinDate}>Edit</Button>
+                        {!isEditfullTimeJoin ?
+                            <Button type="button" buttonClasses="absolute right-0 top-2.5 text-white text-sm" onClick={editfullTimeJoinDate}>Edit</Button> :
+                            <Button type="button" buttonClasses="absolute right-0 top-2.5 text-white text-sm" onClick={editfullTimeJoinDate}>Cancel</Button>
+                        }
                         {isEditfullTimeJoin ?
                             <>
-                                <FormInput label="Full Joining Date" name="date" type="date" value={formik.values.fullTimeJoinDate} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles}`} />
+                                <FormInput label="Full Joining Date" name="date" type="date" placeholder="mm/dd/yyyy" value={formik.values.fullTimeJoinDate} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles} ${formik.values.fullTimeJoinDate === "" ? "!text-[#747681]" : "!text-white"}`} />
                                 {formik.errors.fullTimeJoinDate && formik.touched.fullTimeJoinDate && (
                                     <p className={`${errorClasses}`}>
                                         {formik.errors.date}
                                     </p>
                                 )}
                             </> : <>
-                                <FormInput label="Full Joining Date" name="date" type="date" value={formik.values.date} readOnly onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles}`} />
+                                <FormInput label="Full Joining Date" name="date" type="date" placeholder="mm/dd/yyyy" value={formik.values.date} readOnly onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles} ${formik.values.date === "" ? "!text-[#747681]" : "!text-white"}`} />
                                 {formik.errors.date && formik.touched.date && (
                                     <p className={`${errorClasses}`}>
                                         {formik.errors.date}
@@ -459,7 +514,7 @@ const Form = () => {
                         }
                     </div>
                     <div className="relative">
-                        <FormInput label="Initial Base Salary" name="initialBaseSalary" value={formik.values.initialBaseSalary} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} placeholder="50000" inputClassName={`${inputStyles}`} />
+                        <FormInput type="number" label="Initial Base Salary" name="initialBaseSalary" value={formik.values.initialBaseSalary} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} placeholder="50000" inputClassName={`${inputStyles}`} />
                         {formik.errors.initialBaseSalary && formik.touched.initialBaseSalary && (
                             <p className={`${errorClasses}`}>
                                 {formik.errors.initialBaseSalary}
@@ -467,10 +522,14 @@ const Form = () => {
                         )}
                     </div>
                     <div className="relative">
-                        <Button type="button" buttonClasses="absolute right-0 top-2.5 text-white text-sm" onClick={editCurrentBaseSalary}>Edit</Button>
+                        {!isEditClick ?
+                            <Button type="button" buttonClasses="absolute right-0 top-2.5 text-white text-sm" onClick={editCurrentBaseSalary}>Edit</Button>
+                            :
+                            <Button type="button" buttonClasses="absolute right-0 top-2.5 text-white text-sm" onClick={editCurrentBaseSalary}>Cancel</Button>
+                        }
                         {isEditClick ?
                             <>
-                                <FormInput label="Current Base Salary" name="currentBaseSalary" value={formik.values.currentBaseSalary} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} placeholder="50000" inputClassName={`${inputStyles}`} />
+                                <FormInput type="number" label="Current Base Salary" name="currentBaseSalary" value={formik.values.currentBaseSalary} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} placeholder="50000" inputClassName={`${inputStyles}`} />
 
 
                                 {formik.errors.currentBaseSalary && formik.touched.currentBaseSalary && (
@@ -479,7 +538,7 @@ const Form = () => {
                                     </p>
                                 )}
                             </> : <>
-                                <FormInput label="Current Base Salary" name="currentBaseSalary" value={formik.values.initialBaseSalary} readOnly onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} placeholder="50000" inputClassName={`${inputStyles}`} />
+                                <FormInput type="number" label="Current Base Salary" name="currentBaseSalary" value={formik.values.initialBaseSalary} readOnly onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} placeholder="50000" inputClassName={`${inputStyles}`} />
                                 {formik.errors.currentBaseSalary && formik.touched.currentBaseSalary && (
                                     <p className={`${errorClasses}`}>
                                         {formik.errors.currentBaseSalary}
@@ -576,21 +635,20 @@ const Form = () => {
                         </label>
                         <div className="flex gap-4 flex-wrap mt-3.5">
                             {additionalRoles.map((item, index) => (
-
-
                                 <label key={index} className={`containerCheckMarkMarket`}>
                                     {item}
-                                    <input type="checkbox"  />
+                                    <input
+                                        type="checkbox"
+                                        checked={formik.values.additionalRoles.includes(item)}
+                                    />
                                     <span className="checkmarkMarket"></span>
                                 </label>
-
                             ))}
-
                         </div>
 
                     </div>
                 </div>
-                <Button type="submit" buttonClasses="border border-[#CDD6D7] border-solid bg-[#283573] py-5 px-[75px] rounded-[15px] mt-[58px] text-2xl font-semibold leading-[160%] font-urbanist text-white w-fit">
+                <Button type="submit" disabled={editingEmployee ? !formik.dirty : false} buttonClasses={`border border-[#CDD6D7] border-solid bg-[#283573] py-5 px-[75px] rounded-[15px] mt-[58px] text-2xl font-semibold leading-[160%] font-urbanist text-white w-fit ${editingEmployee && !formik.dirty ? 'opacity-50 !cursor-not-allowed' : 'opacity-1 !cursor-pointer'}`}>
                     {editingEmployee ? 'Update' : 'Register'}
                 </Button>
             </form>

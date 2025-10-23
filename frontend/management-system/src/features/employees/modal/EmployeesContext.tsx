@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export interface EmployeeTableData {
-  id?: number;
+  id?: string;
   name: string;
   status: string;
   date?: string;
@@ -9,6 +9,7 @@ export interface EmployeeTableData {
   department?: string;
   employeeInformation?: string;
   email?: string;
+  password?: string;
   cnic?: string;
   designation?: string;
   team?: string;
@@ -26,6 +27,7 @@ export interface EmployeeTableData {
   currentBaseSalary?: string;
   increamentAmount?: number;
   homeAddress?: string;
+  additionalRoles?: string;
   image?: string;
 }
 
@@ -65,11 +67,11 @@ export const EmployeesProvider: React.FC<EmployeesProviderProps> = ({ children }
   useEffect(() => {
     const loadEmployees = async () => {
       try {
-         
+
           const response = await fetch('/dummy_json_data/employees_json_data/employeeslist.json');
           const data = await response.json();
           setEmployeesList(data.employeesList);
-        
+
       } catch (error) {
         console.error(error);
       }
@@ -77,7 +79,7 @@ export const EmployeesProvider: React.FC<EmployeesProviderProps> = ({ children }
     loadEmployees();
   }, []);
 
-  const isDuplicateId = (id?: number) => {
+  const isDuplicateId = (id?: string) => {
     return id ? employeesList.some((employee) => employee.id === id) : false;
   }
 
@@ -99,6 +101,7 @@ export const EmployeesProvider: React.FC<EmployeesProviderProps> = ({ children }
   };
 
   const editEmployeeData = (employee: EmployeeTableData) => {
+    console.log(employee)
     setEditingEmployee(employee);
     setSuccessfullModal(false);
     document.body.style.overflow = "auto";

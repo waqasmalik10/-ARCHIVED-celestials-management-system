@@ -10,9 +10,9 @@ import StatusModal from "./StatusModal";
 
 
 const EmployeeTable = () => {
-    const { employeesList } = useEmployees();
+    const { employeesList, updateStatus } = useEmployees();
     const navigate = useNavigate();
-    const [isStatusModalOpen, setIsStatusModalOpen] = useState(false)
+    const [currentEmployee, setCurrentEmployee] = useState<EmployeeTableData | null>(null)
 
 
     const [ref, isVisible] = useIntersectionObserver({ threshold: 0.1 }) as [
@@ -31,11 +31,29 @@ const EmployeeTable = () => {
 
     const handleNameClick = (employee: EmployeeTableData) => {
         console.log(employee,)
-        navigate(`/employees/update-employees/${employee.id || ''}`);
+        navigate(`/employees/update-employees/${employee.id}`);
     };
 
-    const statusModalOpen = () => {
-        setIsStatusModalOpen(!isStatusModalOpen)
+    const handleHistoryClick = (employee: EmployeeTableData) => {
+        navigate(`/employees/increament-history/${employee.id}`)
+    }
+
+    const statusModalOpen = (employee: EmployeeTableData) => {
+        setCurrentEmployee(employee)
+         window.scrollTo(0, 0);
+        document.body.style.overflow = "hidden"
+    }
+
+    const updateStatusText = (id: string, newStatus: string) => {
+        updateStatus(id, newStatus)
+        setCurrentEmployee(null)
+         window.scrollTo(0, 0);
+        document.body.style.overflow = "auto"
+    }
+    const closeStatusModal = () => {
+        setCurrentEmployee(null)
+        window.scrollTo(0, 0);
+        document.body.style.overflow = "auto"
     }
 
     console.log(employeesList)
@@ -58,9 +76,6 @@ const EmployeeTable = () => {
                                 </th>
                                 <th className="py-3 md:py-[19px] text-base md:text-lg font-inter font-medium leading-normal md:leading-[30px] text-[#FFFFFF7A] w-[30%] pl-3 pr-10 text-right">
                                     Increament
-                                    {/* <Button buttonClasses="bodyBackground px-4 py-3">
-                                        History
-                                    </Button> */}
                                 </th>
                             </tr>
                         </thead>
@@ -75,17 +90,17 @@ const EmployeeTable = () => {
                                         </button>
                                     </td>
                                     <td className="w-[30%] py-3 md:py-[19px]  pr-10 text-right">
-                                        <button type="button" onClick={statusModalOpen}
-                                            className={`rounded-[15px] ml-auto px-[15px] h-6 md:h-[30px] text-xs md:text-[15px] md:leading-6 font-medium font-inter pt-px flex items-center w-fit ${data.status === "In-active"
-                                                ? "text-[#FF8663] bg-[#FF866314]"
-                                                : "text-[#ADDC7B] bg-[#ADDC7B14]"
+                                        <button type="button" onClick={() => statusModalOpen(data)}
+                                            className={`rounded-[15px] ml-auto px-[15px] h-6 md:h-[30px] text-xs md:text-[15px] md:leading-6 font-medium font-inter pt-px flex items-center w-fit ${data.status === "Active"
+                                                ? "text-[#ADDC7B] bg-[#ADDC7B14]"
+                                                : "text-[#FF8663] bg-[#FF866314]"
                                                 }`}
                                         >
                                             {data.status}
                                         </button>
                                     </td>
                                     <td className="w-[30%] py-2.5 md:py-3.5  pr-10 text-right">
-                                        <Button buttonClasses="bodyBackground px-4 py-3 font-inter font-medium text-base sm:text-lg md:text-xl leading-normal text-white whitespace-nowrap rounded-[15px]">
+                                        <Button onClick={() => handleHistoryClick(data)} buttonClasses="bodyBackground px-4 py-3 font-inter font-medium text-base sm:text-lg md:text-xl leading-normal text-white whitespace-nowrap rounded-[15px]">
                                             History
                                         </Button>
                                     </td>
@@ -95,8 +110,8 @@ const EmployeeTable = () => {
                     </table>
                 </div>
             </Box>
-            {isStatusModalOpen && 
-                <StatusModal />
+            {currentEmployee &&
+                <StatusModal closeModal={closeStatusModal} employeeStatus={currentEmployee} onStatusUpdate={updateStatusText} />
             }
         </>
     )

@@ -1,11 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import closeIcon from "../assets/images/closeIcon.svg"
 
 interface ModalProps {
   modalClassName?: string;
   children: React.ReactNode;
   modalMain?: string;
   onClick?: () => void;
+  closeButtonCLick?: () => void;
 }
 
 const Modal = React.forwardRef<HTMLDivElement, ModalProps>(({
@@ -13,6 +15,7 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(({
   modalMain,
   children,
   onClick,
+  closeButtonCLick,
   ...props
 }, ref) => {
   const modalRoot = document.getElementById('modal-root');
@@ -31,6 +34,9 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(({
         ref={ref}
         className={`relative bodyBackground min-w-[500px] rounded-[15px] overflow-hidden transition-opacity duration-500 min-h-[200px] ${modalClassName}`}
       >
+        <button onClick={closeButtonCLick} type='button' className='absolute top-3.5 right-3.5'>
+          <img src={closeIcon} alt='close' />
+        </button>
         {children}
       </div>
 

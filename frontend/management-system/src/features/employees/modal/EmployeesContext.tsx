@@ -1,4 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { fetchEmploeeTableData } from '../api/employees';
+import { fetchStatusList } from '../api/employees';
+
+interface IncrementHistory {
+  increamentAmount: number;
+  increamentDate: string;
+}
 
 export interface EmployeeTableData {
   id?: string;
@@ -6,6 +13,7 @@ export interface EmployeeTableData {
   status: string;
   date?: string;
   fullTimeJoinDate?: string;
+  lastIncreamentDate?: string;
   department?: string;
   employeeInformation?: string;
   email?: string;
@@ -25,10 +33,17 @@ export interface EmployeeTableData {
   bankBranchCode?: string;
   initialBaseSalary?: string;
   currentBaseSalary?: string;
-  increamentAmount?: number;
+  lastIncreament?: IncrementHistory[];
   homeAddress?: string;
   additionalRoles?: string;
   image?: string;
+}
+
+export interface StatusListData {
+   active: "string",
+  inActive: "string",
+  terminated: "string",
+  resigned: "string", retired: "string", onLeave: "string", suspended: "string", probationary: "string",
 }
 
 interface EmployeesContextType {
@@ -42,7 +57,10 @@ interface EmployeesContextType {
   setEditingEmployee: (emp: EmployeeTableData | null) => void;
   updateEmployee: (emp: EmployeeTableData) => void;
   editingEmployee: EmployeeTableData | null;
+  statusList?: StatusListData[]
+  updateStatus: (id: string, newStatus: string) => void;
 }
+
 
 const EmployeesContext = createContext<EmployeesContextType | undefined>(undefined);
 
@@ -60,6 +78,7 @@ interface EmployeesProviderProps {
 
 export const EmployeesProvider: React.FC<EmployeesProviderProps> = ({ children }) => {
   const [employeesList, setEmployeesList] = useState<EmployeeTableData[]>([]);
+  const [statusList, setStatusList] = useState<StatusListData[]>([])
   const [idExistError, setIdExistError] = useState("")
   const [successfullModal, setSuccessfullModal] = useState<boolean>(false)
   const [editingEmployee, setEditingEmployee] = useState<EmployeeTableData | null>(null);
@@ -67,16 +86,24 @@ export const EmployeesProvider: React.FC<EmployeesProviderProps> = ({ children }
   useEffect(() => {
     const loadEmployees = async () => {
       try {
-
-          const response = await fetch('/dummy_json_data/employees_json_data/employeeslist.json');
-          const data = await response.json();
-          setEmployeesList(data.employeesList);
-
+        const data = await fetchEmploeeTableData();
+        setEmployeesList(data.employeesList);
       } catch (error) {
         console.error(error);
       }
     };
+
+    const loadStatus = async () => {
+      try {
+        const data = await fetchStatusList();
+        setStatusList(data.statusList)
+      } catch (error) {
+        console.log(error)
+      }
+    }
     loadEmployees();
+    loadStatus()
+
   }, []);
 
   const isDuplicateId = (id?: string) => {
@@ -128,10 +155,17 @@ export const EmployeesProvider: React.FC<EmployeesProviderProps> = ({ children }
   };
 
 
+  const updateStatus = (id: string, newStatus: string) => {
+    const updatedList = employeesList.map((emp) =>
+      emp.id === id ? { ...emp, status: newStatus } : emp
+    );
+    setEmployeesList(updatedList);
+  };
+
   const clearError = () => setIdExistError("");
 
   return (
-    <EmployeesContext.Provider value={{ employeesList, addEmployee, idExistError, clearError, successfullModal, setSuccessfullModal, editEmployeeData, editingEmployee, updateEmployee, setEditingEmployee }}>
+    <EmployeesContext.Provider value={{ employeesList, addEmployee, idExistError, clearError, successfullModal, setSuccessfullModal, editEmployeeData, editingEmployee, updateEmployee, setEditingEmployee, statusList, updateStatus }}>
       {children}
     </EmployeesContext.Provider>
   );

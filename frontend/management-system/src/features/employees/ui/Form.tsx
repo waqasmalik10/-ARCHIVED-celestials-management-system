@@ -29,6 +29,7 @@ const formSchema = Yup.object().shape({
     companyId: Yup.string().required("Company ID is required"),
     dateOfBirth: Yup.string().required("Date of birth is required"),
     actualDateOfBirth: Yup.string().required("Actual DOB is required"),
+    increamentDateOfBirth: Yup.string().required("Increament Date is required"),
     bankName: Yup.string().required("Bank name is required"),
     bankTitle: Yup.string().required("Bank title is required"),
     bankAccountNumber: Yup.number().required("Account number is required"),
@@ -144,6 +145,7 @@ const Form = () => {
                 employeeInformation: values.employeeInformation || '',
                 date: values.date as string,
                 fullTimeJoinDate: values.fullTimeJoinDate as string,
+                lastIncreamentDate: values.lastIncreamentDate as string,
                 status: 'Active',
                 email: values.email || '',
                 password: values.password || '',
@@ -162,7 +164,7 @@ const Form = () => {
                 bankBranchCode: values.bankBranchCode || '',
                 initialBaseSalary: values.initialBaseSalary || '',
                 currentBaseSalary: values.currentBaseSalary || '',
-                increamentAmount: values.increamentAmount || 0,
+                lastIncreament: values.increamentAmount || '',
                 homeAddress: values.homeAddress || '',
                 image: values.image || '',
                 additionalRoles: values.additionalRoles.join(', ') || ''
@@ -189,6 +191,7 @@ const Form = () => {
     const [isEditClick, setIsEditClick] = useState(false);
     const [isEditfullTimeJoin, setIsEditFullTimeJoin] = useState(false)
     const [isEditDateOfBirth, setIsEditDateOfBirth] = useState(false)
+    const [isEditLastIncreamentDate, setIsEditLastIncreamentDate] = useState(false)
     const editCurrentBaseSalary = () => {
         setIsEditClick(!isEditClick)
     }
@@ -200,6 +203,18 @@ const Form = () => {
     const editDateOfBirth = () => {
         setIsEditDateOfBirth(!isEditDateOfBirth)
     }
+    const editIncreamentDate = () => {
+        setIsEditLastIncreamentDate(!isEditLastIncreamentDate)
+    }
+
+    useEffect(() => {
+        if (editingEmployee?.lastIncreament && editingEmployee.lastIncreament.length > 0) {
+            const latestTimestamp = Math.max(...editingEmployee.lastIncreament.map(last => new Date(last.increamentDate).getTime()));
+            console.log(latestTimestamp,"Latest Time")
+            const latestDate = new Date(latestTimestamp).toISOString().split('T')[0];
+            formik.setFieldValue('lastIncreamentDate', latestDate);
+        }
+    }, [editingEmployee])
 
 
     const formik = useFormik({
@@ -224,11 +239,12 @@ const Form = () => {
             bankBranchCode: editingEmployee?.bankBranchCode || "",
             initialBaseSalary: editingEmployee?.initialBaseSalary || "",
             currentBaseSalary: editingEmployee ? (editingEmployee.currentBaseSalary || editingEmployee.initialBaseSalary) : "",
-            increamentAmount: editingEmployee?.increamentAmount || 0,
+            increamentAmount: editingEmployee?.lastIncreament?.length ? editingEmployee.lastIncreament[editingEmployee.lastIncreament.length - 1].increamentAmount : 0,
             homeAddress: editingEmployee?.homeAddress || "",
             status: editingEmployee?.status || "Active",
             date: editingEmployee?.date || "",
             fullTimeJoinDate: editingEmployee?.fullTimeJoinDate || "",
+            lastIncreamentDate: editingEmployee?.lastIncreamentDate || "",
             additionalRoles: editingEmployee?.additionalRoles ? editingEmployee.additionalRoles.split(',').map(role => role.trim()) : [],
         },
         validationSchema: formSchema,
@@ -244,7 +260,7 @@ const Form = () => {
 
 
     }, [editingEmployee])
-  
+
     console.log(formik.values.name, "Values")
     console.log(editingEmployee?.name)
 
@@ -497,14 +513,37 @@ const Form = () => {
                         }
                         {isEditfullTimeJoin ?
                             <>
-                                <FormInput label="Full Joining Date" name="date" type="date" placeholder="mm/dd/yyyy" value={formik.values.fullTimeJoinDate} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles} ${formik.values.fullTimeJoinDate === "" ? "!text-[#747681]" : "!text-white"}`} />
+                                <FormInput label="Full Joining Date" name="fullTimeJoinDate" type="date" placeholder="mm/dd/yyyy" value={formik.values.fullTimeJoinDate} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles} ${formik.values.fullTimeJoinDate === "" ? "!text-[#747681]" : "!text-white"}`} />
                                 {formik.errors.fullTimeJoinDate && formik.touched.fullTimeJoinDate && (
                                     <p className={`${errorClasses}`}>
-                                        {formik.errors.date}
+                                        {formik.errors.fullTimeJoinDate}
                                     </p>
                                 )}
                             </> : <>
                                 <FormInput label="Full Joining Date" name="date" type="date" placeholder="mm/dd/yyyy" value={formik.values.date} readOnly onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles} ${formik.values.date === "" ? "!text-[#747681]" : "!text-white"}`} />
+                                {formik.errors.date && formik.touched.date && (
+                                    <p className={`${errorClasses}`}>
+                                        {formik.errors.fullTimeJoinDate}
+                                    </p>
+                                )}
+                            </>
+                        }
+                    </div>
+                    <div className="relative">
+                        {!isEditLastIncreamentDate ?
+                            <Button type="button" buttonClasses="absolute right-0 top-2.5 text-white text-sm" onClick={editIncreamentDate}>Edit</Button> :
+                            <Button type="button" buttonClasses="absolute right-0 top-2.5 text-white text-sm" onClick={editIncreamentDate}>Cancel</Button>
+                        }
+                        {isEditLastIncreamentDate ?
+                            <>
+                                <FormInput label="Increament Date" name="lastIncreamentDate" type="date" placeholder="mm/dd/yyyy" value={formik.values.lastIncreamentDate} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles} ${formik.values.lastIncreamentDate === "" ? "!text-[#747681]" : "!text-white"}`} />
+                                {formik.errors.lastIncreamentDate && formik.touched.lastIncreamentDate && (
+                                    <p className={`${errorClasses}`}>
+                                        {formik.errors.lastIncreamentDate}
+                                    </p>
+                                )}
+                            </> : <>
+                                <FormInput label="Increament Date" name="date" type="date" placeholder="mm/dd/yyyy" value={formik.values.date} readOnly onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles} ${formik.values.date === "" ? "!text-[#747681]" : "!text-white"}`} />
                                 {formik.errors.date && formik.touched.date && (
                                     <p className={`${errorClasses}`}>
                                         {formik.errors.date}
@@ -513,6 +552,7 @@ const Form = () => {
                             </>
                         }
                     </div>
+
                     <div className="relative">
                         <FormInput type="number" label="Initial Base Salary" name="initialBaseSalary" value={formik.values.initialBaseSalary} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} placeholder="50000" inputClassName={`${inputStyles}`} />
                         {formik.errors.initialBaseSalary && formik.touched.initialBaseSalary && (

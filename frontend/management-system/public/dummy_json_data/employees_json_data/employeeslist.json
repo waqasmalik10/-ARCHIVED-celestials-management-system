@@ -12,7 +12,12 @@
       "currentBaseSalary": "1234",
       "date": "2022-04-20",
       "fullTimeJoinDate": "2022-04-20",
-      "increamentAmount": 0,
+      "lastIncreament": [
+        {
+          "increamentAmount": 5000,
+          "increamentDate": "2023-02-15"
+        }
+      ],
       "department": "Frontend Developer",
       "team": "Frontend Team",
       "homeAddress": "Street 1, City A",
@@ -40,7 +45,12 @@
       "currentBaseSalary": "120000",
       "date": "2021-01-15",
       "fullTimeJoinDate": "2021-01-15",
-      "increamentAmount": 0,
+      "lastIncreament": [
+        {
+          "increamentAmount": 12000,
+          "increamentDate": "2023-06-20"
+        }
+      ],
       "department": "Backend Developer",
       "team": "Backend Team",
       "homeAddress": "Street 2, City B",
@@ -68,7 +78,12 @@
       "currentBaseSalary": "100000",
       "date": "2020-06-10",
       "fullTimeJoinDate": "2020-06-10",
-      "increamentAmount": 0,
+      "lastIncreament": [
+        {
+          "increamentAmount": 8000,
+          "increamentDate": "2022-11-11"
+        }
+      ],
       "department": "QA",
       "team": "QA Team",
       "homeAddress": "Street 3, City C",
@@ -96,7 +111,12 @@
       "currentBaseSalary": "95000",
       "date": "2023-03-05",
       "fullTimeJoinDate": "2023-03-05",
-      "increamentAmount": 0,
+      "lastIncreament": [
+        {
+          "increamentAmount": 10000,
+          "increamentDate": "2024-02-14"
+        }
+      ],
       "department": "HR",
       "team": "HR Team",
       "homeAddress": "Street 4, City D",
@@ -124,7 +144,12 @@
       "currentBaseSalary": "110000",
       "date": "2022-09-01",
       "fullTimeJoinDate": "2022-09-01",
-      "increamentAmount": 0,
+      "lastIncreament": [
+        {
+          "increamentAmount": 15000,
+          "increamentDate": "2023-03-19"
+        }
+      ],
       "department": "Marketing",
       "team": "Marketing Team",
       "homeAddress": "Street 5, City E",
@@ -152,7 +177,12 @@
       "currentBaseSalary": "130000",
       "date": "2020-12-20",
       "fullTimeJoinDate": "2020-12-20",
-      "increamentAmount": 0,
+      "lastIncreament": [
+        {
+          "increamentAmount": 11000,
+          "increamentDate": "2023-05-22"
+        }
+      ],
       "department": "Finance",
       "team": "Accounts",
       "homeAddress": "Street 6, City F",
@@ -180,35 +210,12 @@
       "currentBaseSalary": "140000",
       "date": "2021-07-18",
       "fullTimeJoinDate": "2021-07-18",
-      "increamentAmount": 0,
-      "department": "IT Support",
-      "team": "Tech Team",
-      "homeAddress": "Street 7, City G",
-      "email": "bilal.aslam@example.com",
-      "password": "techadmin",
-      "designation": "IT Administrator",
-      "cnic": "78901-2345678-9",
-      "dateOfBirth": "1993-04-15",
-      "actualDateOfBirth": "1993-04-15",
-      "hobbies": "Photography",
-      "vehicleRegistrationNumber": "MNO-321",
-      "companyId": "327",
-      "additionalRoles": "",
-      "status": "Active"
-    },
-    {
-      "id": "8",
-      "name": "Bilal Ahmad",
-      "bankName": "Ubl",
-      "bankTitle": "Mr.",
-      "bankAccountNumber": "7890123456",
-      "bankIBAN": "PK36ASKR0000007890123456",
-      "bankBranchCode": "0707",
-      "initialBaseSalary": "140000",
-      "currentBaseSalary": "140000",
-      "date": "2021-07-18",
-      "fullTimeJoinDate": "2021-07-18",
-      "increamentAmount": 0,
+      "lastIncreament": [
+        {
+          "increamentAmount": 9500,
+          "increamentDate": "2023-08-10"
+        }
+      ],
       "department": "IT Support",
       "team": "Tech Team",
       "homeAddress": "Street 7, City G",

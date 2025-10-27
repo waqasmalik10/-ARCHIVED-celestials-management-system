@@ -48,14 +48,14 @@ const StatusModal = ({ closeModal, onStatusUpdate, employeeStatus }: StatusModal
         {statusList?.map((data: StatusListData, index: number) => (
           <div key={index} className="flex flex-col gap-5 pb-8 px-5 max-h-[570px] overflowYAuto">
             {Object.values(data).map((status: string, statusIndex: number) => (
-              <Button key={statusIndex} disabled={status === disable} onClick={() => selectStatus(status)} buttonClasses={`border border-white outline-none bg-transparent rounded-[15px] p-[18px] text-lg font-inter leading-7 font-semibold text-white transition-all duration-500 ${status === disable ? "opacity-50 !cursor-not-allowed scale-[0.97]" : "opacity-1 !cursor-pointer scale-1"}`}>
+              <Button key={statusIndex} disabled={status === disable} onClick={() => selectStatus(status)} buttonClasses={`border min-h-[64px] border-white outline-none bg-transparent rounded-[15px] p-[18px] text-lg font-inter leading-7 font-semibold text-white transition-all duration-500 ${status === disable ? "opacity-50 !cursor-not-allowed scale-[0.97]" : "opacity-1 !cursor-pointer scale-1"}`}>
                 {status}
               </Button>
             ))}
           </div>
         ))}
         <div className="border-t border-solid border-[#CDD6D7] py-6 px-5 flex justify-center">
-          <Button buttonClasses="px-11 pb-[15px] pt-4 border border-solid border-[#CDD6D7] bg-[#283573] font-urbanist font-semibold text-xl leading-[160%] rounded-[15px] text-white" type="button" onClick={() => {
+          <Button buttonClasses="min-h-[64px] px-11 pb-[15px] pt-4 border border-solid border-[#CDD6D7] bg-[#283573] font-urbanist font-semibold text-xl leading-[160%] rounded-[15px] text-white" type="button" onClick={() => {
             if (employeeStatus?.id && onStatusUpdate && statusText) {
               onStatusUpdate(employeeStatus.id, statusText);
             }

@@ -84,15 +84,15 @@ export default function SignUp() {
         </Link>
       </p>
       <div className="flex flex-col mt-[26px] gap-3.5 w-full">
-        <Button buttonClasses={googleButtonsClasses}>
+        <Button className={googleButtonsClasses}>
           <img src={google} alt="google" className="w-4 h-4" />
           Continue with Google
         </Button>
-        <Button buttonClasses={googleButtonsClasses}>
+        <Button className={googleButtonsClasses}>
           <img src={appleIcon} alt="Apple" className="w-4 h-4" />
           Continue with Apple
         </Button>
-        <Button buttonClasses={`${googleButtonsClasses} !bg-blue-800 !text-white`}>
+        <Button className={`${googleButtonsClasses} !bg-blue-800 !text-white`}>
           <img src={facebookIcon} alt="FaceBook" className="w-4 h-4" />
           Continue with Facebook
         </Button>

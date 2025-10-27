@@ -52,7 +52,7 @@ const IncreamentHistory = () => {
                 <p className="text-[21px] font-medium font-urbanist leading-[180%] mt-6 text-[#FFFFFF99]">
                     Employee Id is <span className="font-semibold">{employeeId}</span>
                 </p>
-                <Button onClick={handleAddIncreamentModal} buttonClasses="bodyBackground px-4 py-3 font-inter font-medium text-base sm:text-lg md:text-xl leading-normal text-white whitespace-nowrap rounded-[15px]">
+                <Button onClick={handleAddIncreamentModal} buttonClasses="bodyBackground h-12 px-4 py-3 font-inter font-medium text-base sm:text-lg md:text-xl leading-normal text-white whitespace-nowrap rounded-[15px]">
                     Add Increament
                 </Button>
             </div>

@@ -89,7 +89,7 @@ const IncrementModalForm = ({ closeModal, incrementFieldsData, updatedIncrement,
                         </div>
                     </div>
                     <div className="border-t border-solid border-[#CDD6D7] py-6 px-5 flex justify-center">
-                        <Button buttonClasses="px-11 pb-[15px] pt-4 border border-solid border-[#CDD6D7] bg-[#283573] font-urbanist font-semibold text-xl leading-[160%] rounded-[15px] text-white" type="submit">
+                        <Button buttonClasses="min-h-[64px] px-11 pb-[15px] pt-4 border border-solid border-[#CDD6D7] bg-[#283573] font-urbanist font-semibold text-xl leading-[160%] rounded-[15px] text-white" type="submit">
                             {incrementFieldsData ? 'Update' : 'Add'}
                         </Button>
                     </div>

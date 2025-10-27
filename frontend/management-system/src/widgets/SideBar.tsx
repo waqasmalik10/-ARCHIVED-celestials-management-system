@@ -211,7 +211,7 @@ export default function SideBar(props: SideBarProps) {
               <Button
                 key={button.label}
                 onClick={button.onClick}
-                buttonClasses={`w-full pl-7 md:pl-[50px] pr-2.5 h-[67px] font-poppins text-white text-sm sm:text-base !text-left relative flex w-full items-center gap-[22px] ${
+                buttonClasses={`!w-full !pl-7 md:!pl-[50px] !pr-2.5 !h-[67px] !font-poppins !text-white !text-sm sm:text-base !text-left relative !flex !justify-start w-full items-center gap-[22px] ${
                   button.active ? activeClass : "bg-transparent !font-medium"
                 }`}
                 style={{ animationDelay: `${index * 0.1}s` }}

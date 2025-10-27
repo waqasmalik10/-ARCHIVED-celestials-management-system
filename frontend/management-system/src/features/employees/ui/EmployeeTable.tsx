@@ -56,8 +56,6 @@ const EmployeeTable = () => {
         document.body.style.overflow = "auto"
     }
 
-    console.log(employeesList)
-
     return (
         <>
             <Box ref={ref}
@@ -85,7 +83,7 @@ const EmployeeTable = () => {
                                 >
                                     <td className="py-3 md:py-[19px] pl-10 w-[40%] flex items-center gap-4 md:gap-[29px]">
                                         <img src={ProfileImage} alt="Profile" className="sm:w-10 sm:h-10 w-[30px] h-[30px]" />
-                                        <button onClick={() => handleNameClick(data)} className="font-inter font-medium text-base sm:text-lg md:text-xl leading-normal text-white whitespace-nowrap hover:underline">
+                                        <button onClick={() => handleNameClick(data)} className="font-inter font-medium text-base sm:text-lg md:text-xl leading-normal text-white whitespace-nowrap">
                                             {data.name}
                                         </button>
                                     </td>

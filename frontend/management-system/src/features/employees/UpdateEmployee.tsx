@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { useEmployees } from "./modal/EmployeesContext";
 
 const UpdateEmployee = () => {
-    const { employeesList, editEmployeeData, editingEmployee } = useEmployees();
+    const { employeesList, editEmployeeData, editingEmployee, setEditingEmployee } = useEmployees();
 
     const { employeeId } = useParams()
     console.log(employeeId, "ID")
@@ -25,7 +25,10 @@ const UpdateEmployee = () => {
                 editEmployeeData(foundEmployee);
             }
         }
-    }, [employeesList, editingEmployee, employeeId])
+        return () => {
+            setEditingEmployee(null);
+        };
+    }, [employeesList, employeeId])
     return (
         <>
             <ImageButton type="button" onClick={backPgae} className="mt-5">

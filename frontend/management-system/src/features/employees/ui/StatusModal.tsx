@@ -44,7 +44,7 @@ const StatusModal = ({ closeModal, onStatusUpdate, employeeStatus }: StatusModal
   return (
     <>
       <Modal ref={modalRef} closeButtonCLick={closeModal}>
-        <h1 className="text-2xl text-center font-poppins text-white p-5">Status Modal</h1>
+        <h1 className="text-2xl text-center font-urbanist font-semibold leading-[150%] border-b border-solid border-[#CDD6D7] text-white p-6 mb-8">Status Modal</h1>
         {statusList?.map((data: StatusListData, index: number) => (
           <div key={index} className="flex flex-col gap-5 pb-8 px-5 max-h-[570px] overflowYAuto">
             {Object.values(data).map((status: string, statusIndex: number) => (
@@ -54,8 +54,8 @@ const StatusModal = ({ closeModal, onStatusUpdate, employeeStatus }: StatusModal
             ))}
           </div>
         ))}
-        <div className="border-t border-solid border-[#CDD6D7] py-8 px-5 flex justify-center">
-          <Button buttonClasses="px-11 py-4 border border-solid border-[#CDD6D7] bg-[#283573] font-urbanist font-semibold text-xl leading-[160%] rounded-[15px] text-white" type="button" onClick={() => {
+        <div className="border-t border-solid border-[#CDD6D7] py-6 px-5 flex justify-center">
+          <Button buttonClasses="px-11 pb-[15px] pt-4 border border-solid border-[#CDD6D7] bg-[#283573] font-urbanist font-semibold text-xl leading-[160%] rounded-[15px] text-white" type="button" onClick={() => {
             if (employeeStatus?.id && onStatusUpdate && statusText) {
               onStatusUpdate(employeeStatus.id, statusText);
             }

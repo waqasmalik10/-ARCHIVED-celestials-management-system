@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { fetchEmploeeTableData } from '../api/employees';
 import { fetchStatusList } from '../api/employees';
+import { object } from 'yup';
 
-interface IncrementHistory {
+export interface IncrementHistory {
   increamentAmount: number;
   increamentDate: string;
 }
@@ -40,7 +41,7 @@ export interface EmployeeTableData {
 }
 
 export interface StatusListData {
-   active: "string",
+  active: "string",
   inActive: "string",
   terminated: "string",
   resigned: "string", retired: "string", onLeave: "string", suspended: "string", probationary: "string",
@@ -54,11 +55,18 @@ interface EmployeesContextType {
   successfullModal: boolean;
   setSuccessfullModal: (value: boolean) => void;
   editEmployeeData: (emp: EmployeeTableData) => void;
+  editIncreamentList: (inc: IncrementHistory) => void;
   setEditingEmployee: (emp: EmployeeTableData | null) => void;
   updateEmployee: (emp: EmployeeTableData) => void;
   editingEmployee: EmployeeTableData | null;
-  statusList?: StatusListData[]
+  statusList?: StatusListData[];
   updateStatus: (id: string, newStatus: string) => void;
+  editingIncreamentList: IncrementHistory | null;
+  setEditingIncreamentList: (inc: IncrementHistory | null) => void;
+  employeeIncreamentList: IncrementHistory[];
+  setEmployeeIncreamentList: (inc: IncrementHistory[]) => void;
+  addNewIncrement: (increament: IncrementHistory) => boolean;
+  updateIncrement: (increament: IncrementHistory) => void;
 }
 
 
@@ -82,6 +90,8 @@ export const EmployeesProvider: React.FC<EmployeesProviderProps> = ({ children }
   const [idExistError, setIdExistError] = useState("")
   const [successfullModal, setSuccessfullModal] = useState<boolean>(false)
   const [editingEmployee, setEditingEmployee] = useState<EmployeeTableData | null>(null);
+  const [editingIncreamentList, setEditingIncreamentList] = useState<IncrementHistory | null>(null);
+  const [employeeIncreamentList, setEmployeeIncreamentList] = useState<IncrementHistory[]>([])
 
   useEffect(() => {
     const loadEmployees = async () => {
@@ -127,6 +137,33 @@ export const EmployeesProvider: React.FC<EmployeesProviderProps> = ({ children }
     }
   };
 
+
+  const addNewIncrement = (increament: IncrementHistory) => {
+    const updatedIncreamentList = [...employeeIncreamentList, increament];
+    setEmployeeIncreamentList(updatedIncreamentList)
+    setEditingIncreamentList(null)
+    window.scrollTo(0, 0);
+    document.body.style.overflow = "hidden"
+    return true
+  };
+
+  const editIncreamentList = (increament: IncrementHistory) => {
+    setEditingIncreamentList(increament)
+    document.body.style.overflow = "auto";
+    window.scrollTo(0, 0);
+  }
+
+  const updateIncrement = (increament: IncrementHistory) => {
+    const updatedList = employeeIncreamentList.map((inc) =>
+      inc.increamentDate === editingIncreamentList?.increamentDate ? increament : inc
+    );
+    setEmployeeIncreamentList(updatedList);
+    setEditingIncreamentList(null);
+    setSuccessfullModal(true);
+    document.body.style.overflow = "hidden";
+    window.scrollTo(0, 0);
+  }
+
   const editEmployeeData = (employee: EmployeeTableData) => {
     console.log(employee)
     setEditingEmployee(employee);
@@ -165,7 +202,7 @@ export const EmployeesProvider: React.FC<EmployeesProviderProps> = ({ children }
   const clearError = () => setIdExistError("");
 
   return (
-    <EmployeesContext.Provider value={{ employeesList, addEmployee, idExistError, clearError, successfullModal, setSuccessfullModal, editEmployeeData, editingEmployee, updateEmployee, setEditingEmployee, statusList, updateStatus }}>
+    <EmployeesContext.Provider value={{ employeesList, addEmployee, idExistError, clearError, successfullModal, setSuccessfullModal, editEmployeeData, editingEmployee, updateEmployee, setEditingEmployee, statusList, updateStatus, addNewIncrement, editIncreamentList, editingIncreamentList, setEditingIncreamentList, employeeIncreamentList, setEmployeeIncreamentList, updateIncrement }}>
       {children}
     </EmployeesContext.Provider>
   );

@@ -11,13 +11,13 @@ interface ModalsInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     ...props
   }: ModalsInputProps) {
     return (
-      <div className="flex flex-col gap-2.5 items-start">
-        <label className={`font-semibold text-white text-[21px] font-urbanist leading-[180%] ${labelClassName}`}>
+      <div className="flex flex-col gap-3 items-start">
+        <label className={` text-xl text-white font-urbanist leading-[160%] font-semibold ${labelClassName}`}>
           {label}
         </label>
         <input
           {...props}
-          className={`w-full px-6 py-4 h-[65px] bg-[#a0a1a8] outline-none text-[#747681] placeholder-[#747681] font-urbanist text-lg font-medium ${inputClassName}`}
+          className={` w-full bg-[#F5F5F5] outline-none border-none px-4 py-3 placeholder-[#04091E99] text-black font-urbanist leading-normal text-base ${inputClassName}`}
         />
       </div>
     );

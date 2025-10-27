@@ -16,6 +16,10 @@
         {
           "increamentAmount": 5000,
           "increamentDate": "2023-02-15"
+        },
+        {
+          "increamentAmount": 3000,
+          "increamentDate": "2021-08-10"
         }
       ],
       "department": "Frontend Developer",
@@ -49,6 +53,10 @@
         {
           "increamentAmount": 12000,
           "increamentDate": "2023-06-20"
+        },
+        {
+          "increamentAmount": 17000,
+          "increamentDate": "2025-08-10"
         }
       ],
       "department": "Backend Developer",
@@ -82,6 +90,10 @@
         {
           "increamentAmount": 8000,
           "increamentDate": "2022-11-11"
+        },
+        {
+          "increamentAmount": 7000,
+          "increamentDate": "2021-09-10"
         }
       ],
       "department": "QA",
@@ -115,6 +127,10 @@
         {
           "increamentAmount": 10000,
           "increamentDate": "2024-02-14"
+        },
+        {
+          "increamentAmount": 15000,
+          "increamentDate": "2025-12-20"
         }
       ],
       "department": "HR",
@@ -148,6 +164,10 @@
         {
           "increamentAmount": 15000,
           "increamentDate": "2023-03-19"
+        },
+        {
+          "increamentAmount": 10000,
+          "increamentDate": "2022-10-20"
         }
       ],
       "department": "Marketing",
@@ -181,6 +201,10 @@
         {
           "increamentAmount": 11000,
           "increamentDate": "2023-05-22"
+        },
+        {
+          "increamentAmount": 12000,
+          "increamentDate": "2024-10-21"
         }
       ],
       "department": "Finance",
@@ -214,6 +238,10 @@
         {
           "increamentAmount": 9500,
           "increamentDate": "2023-08-10"
+        },
+        {
+          "increamentAmount": 800,
+          "increamentDate": "2021-09-12"
         }
       ],
       "department": "IT Support",

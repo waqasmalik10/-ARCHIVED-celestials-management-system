@@ -207,15 +207,13 @@ const Form = () => {
         setIsEditLastIncreamentDate(!isEditLastIncreamentDate)
     }
 
-    useEffect(() => {
-        if (editingEmployee?.lastIncreament && editingEmployee.lastIncreament.length > 0) {
-            const latestTimestamp = Math.max(...editingEmployee.lastIncreament.map(last => new Date(last.increamentDate).getTime()));
-            console.log(latestTimestamp,"Latest Time")
-            const latestDate = new Date(latestTimestamp).toISOString().split('T')[0];
-            formik.setFieldValue('lastIncreamentDate', latestDate);
-        }
-    }, [editingEmployee])
 
+    const latestIncreament = editingEmployee?.lastIncreament?.reduce((latest, current) => {
+        const latestDate = new Date(latest.increamentDate)
+        const currentDate = new Date(current.increamentDate)
+
+        return currentDate > latestDate ? current : latest;
+    })
 
     const formik = useFormik({
         initialValues: {
@@ -239,12 +237,12 @@ const Form = () => {
             bankBranchCode: editingEmployee?.bankBranchCode || "",
             initialBaseSalary: editingEmployee?.initialBaseSalary || "",
             currentBaseSalary: editingEmployee ? (editingEmployee.currentBaseSalary || editingEmployee.initialBaseSalary) : "",
-            increamentAmount: editingEmployee?.lastIncreament?.length ? editingEmployee.lastIncreament[editingEmployee.lastIncreament.length - 1].increamentAmount : 0,
+            increamentAmount: editingEmployee ? (latestIncreament?.increamentAmount) : 0,
             homeAddress: editingEmployee?.homeAddress || "",
             status: editingEmployee?.status || "Active",
             date: editingEmployee?.date || "",
             fullTimeJoinDate: editingEmployee?.fullTimeJoinDate || "",
-            lastIncreamentDate: editingEmployee?.lastIncreamentDate || "",
+            lastIncreamentDate: editingEmployee ? (latestIncreament?.increamentDate) : "",
             additionalRoles: editingEmployee?.additionalRoles ? editingEmployee.additionalRoles.split(',').map(role => role.trim()) : [],
         },
         validationSchema: formSchema,
@@ -257,9 +255,9 @@ const Form = () => {
             setDepartmentName(editingEmployee.department || "Select the Department")
             setTeamName(editingEmployee.team || "Select the Team")
         }
-
-
     }, [editingEmployee])
+
+
 
     console.log(formik.values.name, "Values")
     console.log(editingEmployee?.name)
@@ -543,7 +541,7 @@ const Form = () => {
                                     </p>
                                 )}
                             </> : <>
-                                <FormInput label="Increament Date" name="date" type="date" placeholder="mm/dd/yyyy" value={formik.values.date} readOnly onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles} ${formik.values.date === "" ? "!text-[#747681]" : "!text-white"}`} />
+                                <FormInput label="Increament Date" name="date" type="date" placeholder="mm/dd/yyyy" value={editingEmployee ? latestIncreament?.increamentDate : formik.values.date} readOnly onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles} ${formik.values.date === "" ? "!text-[#747681]" : "!text-white"}`} />
                                 {formik.errors.date && formik.touched.date && (
                                     <p className={`${errorClasses}`}>
                                         {formik.errors.date}

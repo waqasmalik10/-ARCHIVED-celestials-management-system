@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { fetchEmploeeTableData } from '../api/employees';
 import { fetchStatusList } from '../api/employees';
-import { object } from 'yup';
 
 export interface IncrementHistory {
+  increamentId?: string;
   increamentAmount: number;
   increamentDate: string;
 }
@@ -35,6 +35,7 @@ export interface EmployeeTableData {
   initialBaseSalary?: string;
   currentBaseSalary?: string;
   lastIncreament?: IncrementHistory[];
+  lastIncreamentId?: string;
   homeAddress?: string;
   additionalRoles?: string;
   image?: string;
@@ -65,8 +66,14 @@ interface EmployeesContextType {
   setEditingIncreamentList: (inc: IncrementHistory | null) => void;
   employeeIncreamentList: IncrementHistory[];
   setEmployeeIncreamentList: (inc: IncrementHistory[]) => void;
+  isDeleteModal: IncrementHistory | null
+  setIsDeleteModal: (inc: IncrementHistory | null) => void
+  isEmployeeDelete: EmployeeTableData | null;
+  setIsEmployeeDelete: (emp: EmployeeTableData | null) => void;
   addNewIncrement: (increament: IncrementHistory) => boolean;
   updateIncrement: (increament: IncrementHistory) => void;
+  handleIncrementDelete:(increament: IncrementHistory) => void;
+  handleEmployeeDelete:(employee: EmployeeTableData) => void
 }
 
 
@@ -92,6 +99,8 @@ export const EmployeesProvider: React.FC<EmployeesProviderProps> = ({ children }
   const [editingEmployee, setEditingEmployee] = useState<EmployeeTableData | null>(null);
   const [editingIncreamentList, setEditingIncreamentList] = useState<IncrementHistory | null>(null);
   const [employeeIncreamentList, setEmployeeIncreamentList] = useState<IncrementHistory[]>([])
+  const [isEmployeeDelete, setIsEmployeeDelete] = useState<EmployeeTableData | null>(null)
+  const [isDeleteModal, setIsDeleteModal] = useState<IncrementHistory | null>(null);
 
   useEffect(() => {
     const loadEmployees = async () => {
@@ -191,6 +200,18 @@ export const EmployeesProvider: React.FC<EmployeesProviderProps> = ({ children }
     setIdExistError("");
   };
 
+  const handleIncrementDelete = (increament: IncrementHistory) => {
+    const updatingList = employeeIncreamentList.filter(i => i.increamentId !== increament.increamentId)
+    setEmployeeIncreamentList(updatingList)
+    setIsDeleteModal(null)
+  }
+
+  const handleEmployeeDelete = (employee: EmployeeTableData) => {
+    const updateEmployeeList = employeesList.filter(e => e.id !== employee.id)
+    setEmployeesList(updateEmployeeList)
+    setIsEmployeeDelete(null)
+  }
+
 
   const updateStatus = (id: string, newStatus: string) => {
     const updatedList = employeesList.map((emp) =>
@@ -202,7 +223,7 @@ export const EmployeesProvider: React.FC<EmployeesProviderProps> = ({ children }
   const clearError = () => setIdExistError("");
 
   return (
-    <EmployeesContext.Provider value={{ employeesList, addEmployee, idExistError, clearError, successfullModal, setSuccessfullModal, editEmployeeData, editingEmployee, updateEmployee, setEditingEmployee, statusList, updateStatus, addNewIncrement, editIncreamentList, editingIncreamentList, setEditingIncreamentList, employeeIncreamentList, setEmployeeIncreamentList, updateIncrement }}>
+    <EmployeesContext.Provider value={{ employeesList, addEmployee, idExistError, clearError, successfullModal, setSuccessfullModal, editEmployeeData, editingEmployee, updateEmployee, setEditingEmployee, statusList, updateStatus, addNewIncrement, editIncreamentList, editingIncreamentList, setEditingIncreamentList, employeeIncreamentList, setEmployeeIncreamentList, updateIncrement, handleIncrementDelete, setIsDeleteModal, isDeleteModal, setIsEmployeeDelete, isEmployeeDelete, handleEmployeeDelete }}>
       {children}
     </EmployeesContext.Provider>
   );

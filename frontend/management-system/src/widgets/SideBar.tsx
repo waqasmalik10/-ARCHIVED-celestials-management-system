@@ -5,6 +5,7 @@ import departmentsIcon from "../assets/images/departments.svg";
 import swapIcon from "../assets/images/swapIcon.svg";
 import liquidityIcon from "../assets/images/liquidity.svg";
 import companyPolicy from "../assets/images/companyPolicyIcon.svg";
+import financeIcon from "../assets/images/finanaceIcon.svg"
 import settingsIcon from "../assets/images/settingsIcon.svg";
 import settingIcon from "../assets/images/settingIcon.svg";
 import { useNavigate } from "react-router-dom";
@@ -25,6 +26,7 @@ export default function SideBar(props: SideBarProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeDashboard, setActiveDashboard] = useState(false);
   const [activeEmpoyees, setActiveEmployees] = useState(false);
+  const [activeFinance, setActiveFinance] = useState(false)
   const [activeSettings, setActiveSettings] = useState(false);
   const [activeDepartments, setActiveDepartments] = useState(false);
   const [activePolicy, setActivePolicy] = useState(false);
@@ -49,6 +51,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveEmployees(false);
       setActiveDepartments(false);
       setActivePolicy(false);
+      setActiveFinance(false)
       // setLeaves(false);
       // setLoan(false);
     } else if (location.pathname === "/settings") {
@@ -57,6 +60,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveSettings(true);
       setActiveDepartments(false);
       setActivePolicy(false);
+      setActiveFinance(false)
       // setLeaves(false);
       // setLoan(false);
     } else if (
@@ -68,6 +72,19 @@ export default function SideBar(props: SideBarProps) {
       setActiveEmployees(true);
       setActiveDepartments(false);
       setActivePolicy(false);
+      setActiveFinance(false)
+      // setLeaves(false);
+      // setLoan(false);
+    }  else if (
+      location.pathname === "/finance" ||
+      location.pathname.startsWith("/finance")
+    ) {
+      setActiveDashboard(false);
+      setActiveSettings(false);
+      setActiveEmployees(false);
+      setActiveDepartments(false);
+      setActivePolicy(false);
+      setActiveFinance(true)
       // setLeaves(false);
       // setLoan(false);
     } else if (
@@ -87,6 +104,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveEmployees(false);
       setActiveDepartments(false);
       setActivePolicy(true);
+      setActiveFinance(false)
       // setLeaves(false);
       // setLoan(false);
     } else if (location.pathname === "/leaves") {
@@ -95,6 +113,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveEmployees(false);
       setActiveDepartments(false);
       setActivePolicy(false);
+      setActiveFinance(false)
       // setLeaves(true);
       // setLoan(false);
     } else if (location.pathname === "/loan") {
@@ -103,6 +122,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveEmployees(false);
       setActiveDepartments(false);
       setActivePolicy(false);
+      setActiveFinance(false)
       // setLeaves(false);
       // setLoan(true);
     } else {
@@ -111,6 +131,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveEmployees(false);
       setActiveDepartments(false);
       setActivePolicy(false);
+      setActiveFinance(false)
       // setLeaves(false);
       // setLoan(false);
     }
@@ -124,6 +145,9 @@ export default function SideBar(props: SideBarProps) {
   }
   const navigateEmployees = () => {
     navigate("/employees");
+  };
+  const navigateFinance = () => {
+    navigate("/finance")
   };
   const navigateDepartments = () => {
     navigate("/departments");
@@ -157,6 +181,14 @@ export default function SideBar(props: SideBarProps) {
       active: activeEmpoyees,
       show: props.superAdmin,
     },
+    {
+      label: "Finance",
+      icon: financeIcon,
+      onClick: navigateFinance,
+      active: activeFinance,
+      show: props.superAdmin,
+    },
+
     {
       label: "Departments",
       icon: departmentsIcon,

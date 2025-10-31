@@ -29,7 +29,6 @@ const formSchema = Yup.object().shape({
     companyId: Yup.string().required("Company ID is required"),
     dateOfBirth: Yup.string().required("Date of birth is required"),
     actualDateOfBirth: Yup.string().required("Actual DOB is required"),
-    increamentDateOfBirth: Yup.string().required("Increament Date is required"),
     bankName: Yup.string().required("Bank name is required"),
     bankTitle: Yup.string().required("Bank title is required"),
     bankAccountNumber: Yup.number().required("Account number is required"),
@@ -38,6 +37,7 @@ const formSchema = Yup.object().shape({
     initialBaseSalary: Yup.string().required("Salary is required"),
     currentBaseSalary: Yup.string().required("Current Salary is required"),
     increamentAmount: Yup.number().required("Increment is required"),
+    lastIncreamentId: Yup.string().required("Increment ID is required"),
     homeAddress: Yup.string().required("Home address is required"),
     status: Yup.string().required("Status is required"),
     date: Yup.string().required("Joining date is required"),
@@ -58,6 +58,7 @@ const Form = () => {
 
 
     const [generatedEmployeeId] = useState<string>(uuidv4());
+    const [generatedIncreamentId] = useState<string>(uuidv4())
     console.log(generatedEmployeeId)
 
     const banksOptions = ["Meezan", "UBL", "Allied", "HBL"];
@@ -165,6 +166,7 @@ const Form = () => {
                 initialBaseSalary: values.initialBaseSalary || '',
                 currentBaseSalary: values.currentBaseSalary || '',
                 lastIncreament: values.increamentAmount || '',
+                lastIncreamentId: values.lastIncreamentId,
                 homeAddress: values.homeAddress || '',
                 image: values.image || '',
                 additionalRoles: values.additionalRoles.join(', ') || ''
@@ -243,6 +245,7 @@ const Form = () => {
             date: editingEmployee?.date || "",
             fullTimeJoinDate: editingEmployee?.fullTimeJoinDate || "",
             lastIncreamentDate: editingEmployee ? (latestIncreament?.increamentDate) : "",
+            lastIncreamentId: editingEmployee ? (latestIncreament?.increamentId) : generatedIncreamentId,
             additionalRoles: editingEmployee?.additionalRoles ? editingEmployee.additionalRoles.split(',').map(role => role.trim()) : [],
         },
         validationSchema: formSchema,
@@ -550,6 +553,20 @@ const Form = () => {
                             </>
                         }
                     </div>
+                    <div className="relative">
+                        <FormInput label="Increament Id"
+                            type="text"
+                            id="lastIncreamentId"
+                            name="lastIncreamentId"
+                            value={formik.values.lastIncreamentId}
+                            onChange={(e) => {
+                                formik.handleChange(e);
+                                clearError();
+                            }}
+                            readOnly
+                            placeholder="Increament Id" labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} inputClassName={`${inputStyles}`} />
+
+                    </div>
 
                     <div className="relative">
                         <FormInput type="number" label="Initial Base Salary" name="initialBaseSalary" value={formik.values.initialBaseSalary} onChange={formik.handleChange} labelClassName={`${labelStyles}`} inputMainBorder={`${inputBorder}`} placeholder="50000" inputClassName={`${inputStyles}`} />
@@ -686,7 +703,7 @@ const Form = () => {
 
                     </div>
                 </div>
-                <Button type="submit" disabled={editingEmployee ? !formik.dirty : false} buttonClasses={`border border-[#CDD6D7] border-solid bg-[#283573] py-5 px-[75px] rounded-[15px] mt-[58px] text-2xl font-semibold leading-[160%] font-urbanist text-white w-fit ${editingEmployee && !formik.dirty ? 'opacity-50 !cursor-not-allowed' : 'opacity-1 !cursor-pointer'}`}>
+                <Button type="submit" disabled={editingEmployee ? !formik.dirty : false} buttonClasses={`min-h-[64px] border border-[#CDD6D7] border-solid bg-[#283573] py-5 px-[75px] rounded-[15px] mt-[58px] text-2xl font-semibold leading-[160%] font-urbanist text-white w-fit ${editingEmployee && !formik.dirty ? 'opacity-50 !cursor-not-allowed' : 'opacity-1 !cursor-pointer'}`}>
                     {editingEmployee ? 'Update' : 'Register'}
                 </Button>
             </form>

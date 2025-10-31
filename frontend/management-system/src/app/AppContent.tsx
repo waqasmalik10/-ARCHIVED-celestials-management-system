@@ -10,6 +10,7 @@ import { VerifyContext } from "./VerifyContext";
 import Footer from "../widgets/Footer";
 import ImageButton from "../shared/ImageButton";
 import { EmployeesProvider } from "../features/employees/modal/EmployeesContext";
+import { FinanceProvider } from "../features/finance/modal/FinanceContext";
 
 export default function AppContent() {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -78,8 +79,9 @@ export default function AppContent() {
           <Route path="/" element={<Navigate to={"/login"} />} />
         </Routes>
       )}{user && (
-        <EmployeesProvider>
-          <div className="bodyBackground h-full min-h-screen">
+        <FinanceProvider>
+          <EmployeesProvider>
+            <div className="bodyBackground h-full min-h-screen">
             <div
               ref={modalRef}
               className={`w-full min-w-[345px] max-w-[345px] fixed h-screen sideBarBackground modalBoxShadow py-5 pb-24 z-[9999] ${window.innerWidth < 1280 ? "-left-[400px]" : ""
@@ -117,7 +119,8 @@ export default function AppContent() {
               <Footer />
             </div>
           </div>
-        </EmployeesProvider>
+          </EmployeesProvider>
+        </FinanceProvider>
       )}
     </>
   );

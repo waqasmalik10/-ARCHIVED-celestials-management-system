@@ -1,9 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import ModalsInput from "../../../shared/ModalsInput";
 import Button from "../../../shared/Button";
 import Modal from "../../../shared/Modal";
+import DeleteModal from "../../../shared/DeleteModal";
+import { v4 as uuidv4 } from "uuid";
 
 interface IncrementModalFormProps {
     closeModal?: () => void;
@@ -21,6 +23,8 @@ const formSchema = Yup.object().shape({
 
 const IncrementModalForm = ({ closeModal, incrementFieldsData, updatedIncrement, addIncrement }: IncrementModalFormProps) => {
     const errorClasses = "text-red-500 text-xs mt-1 absolute -bottom-6"
+    const [generatedIncreamentId] = useState<string>(uuidv4())
+    
     const modalRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -39,6 +43,7 @@ const IncrementModalForm = ({ closeModal, incrementFieldsData, updatedIncrement,
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [closeModal]);
+   
 
     const handleSubmit = (values: any) => {
         if (incrementFieldsData !== null && incrementFieldsData !== undefined) {
@@ -56,6 +61,7 @@ const IncrementModalForm = ({ closeModal, incrementFieldsData, updatedIncrement,
 
     const formik = useFormik({
         initialValues: {
+            increamentId: generatedIncreamentId, 
             increamentAmount: incrementFieldsData?.increamentAmount || 0,
             increamentDate: incrementFieldsData?.increamentDate || ''
         },
@@ -66,9 +72,14 @@ const IncrementModalForm = ({ closeModal, incrementFieldsData, updatedIncrement,
     return (
         <>
             <Modal ref={modalRef} closeButtonCLick={closeModal}>
-                <h1 className="text-2xl text-center font-urbanist leading-[150%] text-white border-b border-solid border-[#CDD6D7] p-6">Increment Update Modal</h1>
+                <h1 className="text-2xl text-center font-urbanist leading-[150%] text-white border-b border-solid border-[#CDD6D7] p-6">Increment {!incrementFieldsData ? "Add" : "Update" }</h1>
                 <form onSubmit={formik.handleSubmit} noValidate>
                     <div className="px-6 py-8 flex flex-col gap-5">
+                        {
+                            !incrementFieldsData &&
+                                 <ModalsInput readOnly label="Increment Id" type="string" onChange={formik.handleChange}
+                                value={formik.values.increamentId} name="increamentId" />
+                        }
                         <div className="relative">
                             <ModalsInput label="Increment Amount" type="number" onChange={formik.handleChange}
                                 value={formik.values.increamentAmount} name="increamentAmount" />

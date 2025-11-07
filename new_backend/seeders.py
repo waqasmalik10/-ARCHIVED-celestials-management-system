@@ -1,6 +1,6 @@
 from sqlmodel import Session, select
 from models import AdditionalRole
-from db import engine
+from admin_db import engine
 def seed_roles(session: Session):
     default_roles = [
         {"role_name": "hr", "role_description": "salary_management"},

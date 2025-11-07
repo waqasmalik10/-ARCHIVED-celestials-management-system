@@ -21,7 +21,6 @@ class Admin(AdminBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
 
 
-
 # --- Additional Roles Table ---
 class AdditionalRoleBase(SQLModel):
     role_name: str = Field(..., min_length=1)
@@ -50,15 +49,10 @@ class EmployeeAdditionalRoleLink(SQLModel, table=True):
     # Relationships
     employee: Optional["Employee"] = Relationship(back_populates="additional_roles")
     role: Optional["AdditionalRole"] = Relationship(back_populates="employees")
-
-
+    
 # --- Employee Table ---
-class Employee(SQLModel, table=True):
-    __tablename__ = "employee"
-
-    # 🔑 employee_id is now the PRIMARY KEY
-    employee_id: str = Field(..., primary_key=True, index=True)
-
+class EmployeeBase(SQLModel):
+    employee_id: str = Field(...,unique=True)
     name: str
     bank_name: str
     bank_account_title: str
@@ -83,6 +77,14 @@ class Employee(SQLModel, table=True):
     hobbies: Optional[str] = None
     vehicle_registration_number: Optional[str] = None
     company_id: int = Field(foreign_key="admin.id")
+    
+    
+class Employee(EmployeeBase, table=True):
+    __tablename__ = "employee"
+
+    # 🔑 employee_id is now the PRIMARY KEY
+    id: Optional[int] = Field(default=None, primary_key=True, index=True)
+    status: bool = Field(default=True)
 
     # ✅ Relationship: optional roles, many-to-many
     additional_roles: List[EmployeeAdditionalRoleLink] = Relationship(back_populates="employee")

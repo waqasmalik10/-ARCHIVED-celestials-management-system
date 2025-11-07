@@ -1,11 +1,10 @@
-from fastapi import Request
 from fastapi import FastAPI, Depends, HTTPException, APIRouter, Request
 from sqlmodel import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
-import db
-from models import AdminBase, AdminResponse, Employee, AdditionalRoleBase, AdditionalRole
-import auth
+import admin_db, auth, employee_db
+from models import AdminBase, AdminResponse, EmployeeBase, AdditionalRoleBase
+from typing import Optional
 
 app = FastAPI(title="Celestials Management System")
 
@@ -37,7 +36,7 @@ router_login = APIRouter(prefix="/admin")
 
 @router_login.post("/login")
 def company_login(form_data: OAuth2PasswordRequestForm = Depends(),
-                  session=Depends(db.get_session),
+                  session=Depends(admin_db.get_session),
                   request: Request = None):
     admin = auth.authenticate_admin(session, form_data.username, form_data.password)
     if not admin or admin.password != form_data.password:
@@ -57,8 +56,8 @@ app.include_router(router_login)
 
 
 @app.post("/register_admin")
-def register_admin(admin: AdminBase, session: Session = Depends(db.get_session)):
-    db.create_admin_in_db(admin, session)
+def register_admin(admin: AdminBase, session: Session = Depends(admin_db.get_session)):
+    admin_db.create_admin_in_db(admin, session)
     return 'Admin Created successfully'
 
 
@@ -70,22 +69,36 @@ def get_company_profile(admin: AdminBase = Depends(auth.get_current_user)):
 
 @app.put("/update_company_profile")
 def update_company_profile(admin: AdminResponse,
-                           current_admin: AdminBase = Depends(auth.get_current_user), session: Session = Depends(db.get_session)):
-    return db.update_company_profile_in_db(admin,  current_admin, session)
+                           current_admin: AdminBase = Depends(auth.get_current_user), session: Session = Depends(admin_db.get_session)):
+    return admin_db.update_company_profile_in_db(admin,  current_admin, session)
 
 
 @app.patch("/update_password")
 def update_password(old:str, new: str, current_admin: AdminBase = Depends(auth.get_current_user),
-                    session: Session = Depends(db.get_session)):
-    return db.update_password_in_db(old, new, current_admin, session)
+                    session: Session = Depends(admin_db.get_session)):
+    return admin_db.update_password_in_db(old, new, current_admin, session)
 
 
 @app.post("/create_employee")
-def register_new_employee(employee: Employee, lst: list[AdditionalRoleBase], current_admin: AdminBase = Depends(auth.get_current_user),
-                    session: Session = Depends(db.get_session)):
-    return db.register_new_employee_in_db(employee, lst, current_admin, session)
+def register_new_employee(employee: EmployeeBase, lst: list[AdditionalRoleBase], current_admin: AdminBase = Depends(auth.get_current_user),
+                    session: Session = Depends(admin_db.get_session)):
+    return employee_db.register_new_employee_in_db(employee, lst, current_admin, session)
 
 @app.patch("/update_employee_details")
-def update_employee_details(employee: Employee, lst: list[AdditionalRoleBase], current_admin: AdminBase = Depends(auth.get_current_user),
-                    session: Session = Depends(db.get_session)):
-    return db.update_employee_details_in_db(employee, lst, current_admin, session)
+def update_employee_details(employee: EmployeeBase, current_admin: AdminBase = Depends(auth.get_current_user),
+                    session: Session = Depends(admin_db.get_session)):
+    return employee_db.update_employee_details_in_db(employee, current_admin, session)
+
+@app.patch("/deactivate_employee")
+def deactivate_employee(employee_id: str, current_admin: AdminBase = Depends(auth.get_current_user), session: Session = Depends(admin_db.get_session)):
+    return employee_db.deactivate_employee_in_db(employee_id, current_admin, session)
+
+@app.get("/display all employees")
+def display_all_employee(page: int = 1, page_size: int = 10, department: Optional[str] = None, team: Optional[str] = None,
+                         current_admin: AdminBase = Depends(auth.get_current_user), session: Session = Depends(admin_db.get_session)):
+    return employee_db.display_all_employee(page, page_size, department, team, current_admin, session)
+
+@app.patch("/Update Roles")
+def update_roles(employee_id: str, lst: list[AdditionalRoleBase], current_admin: AdminBase = Depends(auth.get_current_user),
+                 session: Session = Depends(admin_db.get_session)):
+    return employee_db.update_roles_in_db(employee_id, lst, current_admin, session)

@@ -7,7 +7,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlmodel import Session, select
 import load_env
-from db import get_session
+from admin_db import get_session
 from models import AdminBase, Admin
 
 # Load environment variables

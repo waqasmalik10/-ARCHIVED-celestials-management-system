@@ -23,7 +23,7 @@ const Holdings = () => {
     thirdDataImg: aave,
     fourthDataImg: doge,
     fifthDataImg: uni,
-  };
+  }; 
 
   const modalRef = useRef<HTMLDivElement>(null);
   const [allTableData, setAllTableData] = useState<HoldingData | null>(null);

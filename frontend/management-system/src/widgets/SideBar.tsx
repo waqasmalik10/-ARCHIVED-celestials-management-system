@@ -5,6 +5,7 @@ import departmentsIcon from "../assets/images/departments.svg";
 import swapIcon from "../assets/images/swapIcon.svg";
 import liquidityIcon from "../assets/images/liquidity.svg";
 import companyPolicy from "../assets/images/companyPolicyIcon.svg";
+import financeIcon from "../assets/images/finanaceIcon.svg"
 import settingsIcon from "../assets/images/settingsIcon.svg";
 import settingIcon from "../assets/images/settingIcon.svg";
 import { useNavigate } from "react-router-dom";
@@ -15,7 +16,7 @@ import ImageButton from "../shared/ImageButton";
 
 interface SideBarProps {
   pathTitle?: string | undefined;
-  admin?: boolean;
+  superAdmin?: boolean;
   name?: string;
   sidebarEmail?: string;
   sideBarLogout?: () => void;
@@ -25,6 +26,7 @@ export default function SideBar(props: SideBarProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeDashboard, setActiveDashboard] = useState(false);
   const [activeEmpoyees, setActiveEmployees] = useState(false);
+  const [activeFinance, setActiveFinance] = useState(false)
   const [activeSettings, setActiveSettings] = useState(false);
   const [activeDepartments, setActiveDepartments] = useState(false);
   const [activePolicy, setActivePolicy] = useState(false);
@@ -34,7 +36,7 @@ export default function SideBar(props: SideBarProps) {
 
   const navigate = useNavigate();
 
-  console.log(props.admin, "admin")
+  console.log(props.superAdmin, "super-admin")
 
   useEffect(() => {
     setIsLoaded(true);
@@ -43,12 +45,13 @@ export default function SideBar(props: SideBarProps) {
   const activeClass = "selectedSideBarOption !font-semibold";
 
   useEffect(() => {
-    if (location.pathname === "/dashboard") {
+    if (location.pathname === "/") {
       setActiveDashboard(true);
       setActiveSettings(false);
       setActiveEmployees(false);
       setActiveDepartments(false);
       setActivePolicy(false);
+      setActiveFinance(false)
       // setLeaves(false);
       // setLoan(false);
     } else if (location.pathname === "/settings") {
@@ -57,6 +60,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveSettings(true);
       setActiveDepartments(false);
       setActivePolicy(false);
+      setActiveFinance(false)
       // setLeaves(false);
       // setLoan(false);
     } else if (
@@ -68,6 +72,19 @@ export default function SideBar(props: SideBarProps) {
       setActiveEmployees(true);
       setActiveDepartments(false);
       setActivePolicy(false);
+      setActiveFinance(false)
+      // setLeaves(false);
+      // setLoan(false);
+    }  else if (
+      location.pathname === "/finance" ||
+      location.pathname.startsWith("/finance")
+    ) {
+      setActiveDashboard(false);
+      setActiveSettings(false);
+      setActiveEmployees(false);
+      setActiveDepartments(false);
+      setActivePolicy(false);
+      setActiveFinance(true)
       // setLeaves(false);
       // setLoan(false);
     } else if (
@@ -87,6 +104,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveEmployees(false);
       setActiveDepartments(false);
       setActivePolicy(true);
+      setActiveFinance(false)
       // setLeaves(false);
       // setLoan(false);
     } else if (location.pathname === "/leaves") {
@@ -95,6 +113,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveEmployees(false);
       setActiveDepartments(false);
       setActivePolicy(false);
+      setActiveFinance(false)
       // setLeaves(true);
       // setLoan(false);
     } else if (location.pathname === "/loan") {
@@ -103,6 +122,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveEmployees(false);
       setActiveDepartments(false);
       setActivePolicy(false);
+      setActiveFinance(false)
       // setLeaves(false);
       // setLoan(true);
     } else {
@@ -111,19 +131,23 @@ export default function SideBar(props: SideBarProps) {
       setActiveEmployees(false);
       setActiveDepartments(false);
       setActivePolicy(false);
+      setActiveFinance(false)
       // setLeaves(false);
       // setLoan(false);
     }
   }, [location.pathname]);
 
   const navigateDashboard = () => {
-    navigate("/dashboard");
+    navigate("/");
   };
   function navigateSetting() {
     navigate("/settings");
   }
   const navigateEmployees = () => {
     navigate("/employees");
+  };
+  const navigateFinance = () => {
+    navigate("/finance")
   };
   const navigateDepartments = () => {
     navigate("/departments");
@@ -155,14 +179,22 @@ export default function SideBar(props: SideBarProps) {
       icon: employeesIcon,
       onClick: navigateEmployees,
       active: activeEmpoyees,
-      show: props.admin,
+      show: props.superAdmin,
     },
+    {
+      label: "Finance",
+      icon: financeIcon,
+      onClick: navigateFinance,
+      active: activeFinance,
+      show: props.superAdmin,
+    },
+
     {
       label: "Departments",
       icon: departmentsIcon,
       onClick: navigateDepartments,
       active: activeDepartments,
-      show: props.admin,
+      show: props.superAdmin,
     },
     {
       label: "Liquidity",
@@ -211,7 +243,7 @@ export default function SideBar(props: SideBarProps) {
               <Button
                 key={button.label}
                 onClick={button.onClick}
-                buttonClasses={`w-full pl-7 md:pl-[50px] pr-2.5 h-[67px] font-poppins text-white text-sm sm:text-base !text-left relative flex w-full items-center gap-[22px] ${
+                buttonClasses={`!w-full !pl-7 md:!pl-[50px] !pr-2.5 !h-[67px] !font-poppins !text-white !text-sm sm:text-base !text-left relative !flex !justify-start w-full items-center gap-[22px] ${
                   button.active ? activeClass : "bg-transparent !font-medium"
                 }`}
                 style={{ animationDelay: `${index * 0.1}s` }}

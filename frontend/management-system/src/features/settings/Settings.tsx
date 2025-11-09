@@ -6,14 +6,14 @@ interface SettingProps {
 }
 
 export default function Setting({}: SettingProps) {
-  const { user, admin } = useContext(VerifyContext);
+  const { user, superAdmin } = useContext(VerifyContext);
   return (
     <>
      <div className="mt-[50px]">
       <h1 className="font-popins text-left text-4xl font-semibold text-white mb-[53px]">
         Settings
       </h1>
-      <SettingBody admin={admin} name={user?.name} email={user?.email} />
+      <SettingBody superAdmin={superAdmin} name={user?.name} email={user?.email} />
       </div>
     </>
   );

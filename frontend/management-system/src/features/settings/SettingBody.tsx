@@ -4,7 +4,7 @@ import { ThemeContext } from "../../app/ThemeContext";
 import Button from "../../shared/Button";
 
 interface SettingBodyProps {
-  admin?: boolean;
+  superAdmin?: boolean;
   name?: string;
   email?: string;
 }

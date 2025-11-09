@@ -1,6 +1,6 @@
 import FormButton from "../../../shared/FormButton";
 import FormInput from "../../../shared/FormInputs";
-import Modal from "../../../shared/Modal";
+import AuthModal from "../../../shared/AuthModal";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import google from "../../../assets/images/googleIcon.svg";
@@ -70,7 +70,7 @@ export default function SignUp() {
   });
 
   return (
-    <Modal modalClassName="max-w-lg mx-auto p-7 w-full max-h-fit">
+    <AuthModal modalClassName="max-w-lg mx-auto p-7 w-full max-h-fit">
       {/* <div>
         <img src={logo} alt="logo" className="mx-auto mb-4 md:my-4" />
       </div> */}
@@ -84,15 +84,15 @@ export default function SignUp() {
         </Link>
       </p>
       <div className="flex flex-col mt-[26px] gap-3.5 w-full">
-        <Button buttonClasses={googleButtonsClasses}>
+        <Button className={googleButtonsClasses}>
           <img src={google} alt="google" className="w-4 h-4" />
           Continue with Google
         </Button>
-        <Button buttonClasses={googleButtonsClasses}>
+        <Button className={googleButtonsClasses}>
           <img src={appleIcon} alt="Apple" className="w-4 h-4" />
           Continue with Apple
         </Button>
-        <Button buttonClasses={`${googleButtonsClasses} !bg-blue-800 !text-white`}>
+        <Button className={`${googleButtonsClasses} !bg-blue-800 !text-white`}>
           <img src={facebookIcon} alt="FaceBook" className="w-4 h-4" />
           Continue with Facebook
         </Button>
@@ -196,6 +196,6 @@ export default function SignUp() {
           />
         </div>
       </form>
-    </Modal>
+    </AuthModal>
   );
 }

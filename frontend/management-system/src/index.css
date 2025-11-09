@@ -49,7 +49,7 @@ body {
 }
 
 .modalBoxShadow {
-  box-shadow: 0px 1.26px 12.26px 0px #000000;
+  box-shadow: 0px 0.83px 0.83px 0px #00000014;
 }
 
 .overflowYAuto::-webkit-scrollbar {
@@ -127,7 +127,7 @@ body {
   top: 2px;
   width: 5px;
   height: 10px;
-  border: solid #2c2c35;
+  border: solid white;
   border-width: 0 3px 3px 0;
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
@@ -252,7 +252,7 @@ body {
 
 .navLoader {
   height: 70px;
-   background: linear-gradient(to right,
+  background: linear-gradient(to right,
       #00022e 20%,
       #1e2c6d 50%,
       #00022e 80%);
@@ -609,3 +609,54 @@ select {
 .cardsImgBoxShadow {
   box-shadow: 0px 11.93px 30.38px 0px #00000040;
 }
+
+.inputBox {
+  background: linear-gradient(103.31deg, rgba(255, 255, 255, 0) -9.33%, rgba(255, 255, 255, 0.234) 119.91%);
+}
+
+/* Add this to your global CSS (e.g., styles.css or a module file) */
+
+.inputMainBorder {
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.inputMainBorder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: 15px;
+  background: radial-gradient(81.2% 206.16% at 48.61% 65.05%, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 100%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: -1;
+}
+@keyframes sketchIn {
+  0% {
+    stroke-dashoffset: 2000;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+.sketch-rect {
+  stroke: #00022e;
+  stroke-width: 10px;
+  fill: none;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: sketchIn 2s ease forwards;
+}
+

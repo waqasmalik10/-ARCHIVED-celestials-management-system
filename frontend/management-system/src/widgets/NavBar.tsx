@@ -26,14 +26,14 @@ export default function NavBar({ sideBarClosed }: NavbarProps) {
         <div className="rounded-[13px] w-fit overflow-hidden">
         <Button
           type="button"
-          buttonClasses="blurBackground blurBorder text-base text-white font-medium leading-7 font-inter py-[11.11px] px-[17.78px] !rounded-[13px]"
+          buttonClasses="blurBackground h-[54px] blurBorder text-base text-white font-medium leading-7 font-inter py-[11.11px] px-[17.78px] !rounded-[13px]"
         >
           Buy & Sell
         </Button>
         </div>
         <Button
           type="button"
-          buttonClasses="bg-[#259DA814] text-base font-medium leading-7 font-inter py-[11.11px] px-[17.78px] rounded-[13px] text-[#FE0639]"
+          buttonClasses="bg-[#259DA814] h-[54px] text-base font-medium leading-7 font-inter py-[11.11px] px-[17.78px] rounded-[13px] text-[#FE0639]"
         >
           Connect Wallet
         </Button>

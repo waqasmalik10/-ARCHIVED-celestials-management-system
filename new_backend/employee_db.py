@@ -110,9 +110,11 @@ def deactivate_employee_in_db(employee_id, current_admin, session):
         raise HTTPException(status_code=400, detail="Method not allowed for this employee")
     
     employee_to_update.status = False
+    session.commit()
+    session.refresh(employee_to_update)
     return {"Mesasage" : "Employee has been Seactivated", "Employee" : employee_to_update.employee_id, "Status": employee_to_update.status}
 
-def display_all_employee(page, page_size, department, team, current_admin, session):
+def display_all_employee_in_db(page, page_size, department, team, current_admin, session):
     
     query = select(Employee).where(Employee.company_id == current_admin.id)
 
@@ -144,37 +146,42 @@ def display_all_employee(page, page_size, department, team, current_admin, sessi
         },
         "employees": paginated_employees,
     }
-    
-# Under Working
+
+
 def update_roles_in_db(employee_id, lst, current_admin, session):
     if employee_id == "string":
         raise HTTPException(status_code=400, detail="Enter employee_id")
 
-    employee_to_update = session.exec(
+    # --- Get employee ---
+    employee = session.exec(
         select(Employee).where(Employee.employee_id == employee_id)
     ).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
 
-    if not employee_to_update:
-        raise HTTPException(status_code=400, detail="Employee does not exist")
+    # --- Validate admin ownership ---
+    if employee.company_id != current_admin.id:
+        raise HTTPException(status_code=403, detail="You are not authorized to update this employee")
 
-    if employee_to_update.company_id != current_admin.id:
-        raise HTTPException(status_code=400, detail="Method not allowed for this employee")
-    # --- Handle roles logic ---
-    for role_data in lst:
-        role_to_update = session.exec(
-            select(AdditionalRole).where(AdditionalRole.role_name == role_data.role_name)
-        ).first()
+    # --- Get all current roles linked to this employee ---
+    current_links = session.exec(
+        select(EmployeeAdditionalRoleLink)
+        .where(EmployeeAdditionalRoleLink.employee_id == employee_id)
+    ).all()
+    print(current_links)
 
-        if not role_to_update:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Role '{role_data.role_name}' not found for update"
-            )
-
-        if role_data.role_description and role_data.role_description != "string":
-            role_to_update.role_description = role_data.role_description
-
-        session.add(role_to_update)
+    current_role_ids = [link.role_id for link in current_links]
+    print(type(current_role_ids))
     
+    print(current_role_ids)
     
-    return {"message": "Role updated successfully", "Roles": lst}
+    # --- assuming the ideal scenario that we have count(old_roles) == count(new_roles)
+    for id in range(len(current_role_ids)):
+        role = session.exec(select(AdditionalRole).where(AdditionalRole.id == current_role_ids[id])).first()
+        role.role_name = lst[id].role_name
+        role.role_description = lst[id].role_description
+    
+    session.commit()
+    session.refresh(role)
+    
+    return {"Mesaage": "Role Updated", "Roles": lst}

@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException, APIRouter, Request
 from sqlmodel import Session
 from fastapi.security import OAuth2PasswordRequestForm
-from datetime import timedelta
-import admin_db, auth, employee_db
-from models import AdminBase, AdminResponse, EmployeeBase, AdditionalRoleBase
+from datetime import timedelta, date
+import admin_db, auth, employee_db, increment_db
+from models import AdminBase, AdminResponse, EmployeeBase, AdditionalRoleBase, EmployeeIncrement
 from typing import Optional
 
 app = FastAPI(title="Celestials Management System")
@@ -52,8 +52,6 @@ def company_login(form_data: OAuth2PasswordRequestForm = Depends(),
     return {"access_token": token, "token_type": "bearer"}
 
 
-app.include_router(router_login)
-
 
 @app.post("/register_admin")
 def register_admin(admin: AdminBase, session: Session = Depends(admin_db.get_session)):
@@ -67,38 +65,62 @@ def get_company_profile(admin: AdminBase = Depends(auth.get_current_user)):
     return {"Comapany Name": admin.company_name, "Website": admin.website, "Address": admin.address, "Phone No.": admin.phone, "Email" : admin.email}
 
 
-@app.put("/update_company_profile")
+@router_login.put("/update_company_profile")
 def update_company_profile(admin: AdminResponse,
                            current_admin: AdminBase = Depends(auth.get_current_user), session: Session = Depends(admin_db.get_session)):
     return admin_db.update_company_profile_in_db(admin,  current_admin, session)
 
 
-@app.patch("/update_password")
+@router_login.patch("/update_password")
 def update_password(old:str, new: str, current_admin: AdminBase = Depends(auth.get_current_user),
                     session: Session = Depends(admin_db.get_session)):
     return admin_db.update_password_in_db(old, new, current_admin, session)
 
 
-@app.post("/create_employee")
+@router_login.post("/create_employee")
 def register_new_employee(employee: EmployeeBase, lst: list[AdditionalRoleBase], current_admin: AdminBase = Depends(auth.get_current_user),
                     session: Session = Depends(admin_db.get_session)):
     return employee_db.register_new_employee_in_db(employee, lst, current_admin, session)
 
-@app.patch("/update_employee_details")
+@router_login.patch("/update_employee_details")
 def update_employee_details(employee: EmployeeBase, current_admin: AdminBase = Depends(auth.get_current_user),
                     session: Session = Depends(admin_db.get_session)):
     return employee_db.update_employee_details_in_db(employee, current_admin, session)
 
-@app.patch("/deactivate_employee")
+@router_login.patch("/deactivate_employee")
 def deactivate_employee(employee_id: str, current_admin: AdminBase = Depends(auth.get_current_user), session: Session = Depends(admin_db.get_session)):
     return employee_db.deactivate_employee_in_db(employee_id, current_admin, session)
 
-@app.get("/display all employees")
+@router_login.get("/display all employees")
 def display_all_employee(page: int = 1, page_size: int = 10, department: Optional[str] = None, team: Optional[str] = None,
                          current_admin: AdminBase = Depends(auth.get_current_user), session: Session = Depends(admin_db.get_session)):
-    return employee_db.display_all_employee(page, page_size, department, team, current_admin, session)
+    return employee_db.display_all_employee_in_db(page, page_size, department, team, current_admin, session)
 
-@app.patch("/Update Roles")
+@router_login.patch("/Update Roles")
 def update_roles(employee_id: str, lst: list[AdditionalRoleBase], current_admin: AdminBase = Depends(auth.get_current_user),
                  session: Session = Depends(admin_db.get_session)):
     return employee_db.update_roles_in_db(employee_id, lst, current_admin, session)
+
+# Under Working..........
+@router_login.post("create_increment")
+def create_increment_in_db(new_increment: EmployeeIncrement, session: Session = Depends(admin_db.get_session), 
+                           current_admin: AdminBase = Depends(auth.get_current_user)):
+    return increment_db.create_increment_in_db(new_increment, session)
+
+@router_login.get("get_increments")
+def get_increments(employee_id: str, session: Session = Depends(admin_db.get_session),
+                   current_admin: AdminBase = Depends(auth.get_current_user)):
+    return increment_db.get_increments_in_db(employee_id, session)
+
+@router_login.patch("update_increment")
+def update_increment(new_increment: EmployeeIncrement, session: Session = Depends(admin_db.get_session),
+                     current_admin: AdminBase = Depends(auth.get_current_user)):
+    return increment_db.update_increment_in_db(new_increment, session)
+
+@router_login.put("delete_increment")
+def delete_increment(employee_id: str, session: Session = Depends(admin_db.get_session),
+                     current_admin: AdminBase = Depends(auth.get_current_user)):
+    return increment_db.delete_increment_in_db(employee_id, session)
+
+
+app.include_router(router_login)

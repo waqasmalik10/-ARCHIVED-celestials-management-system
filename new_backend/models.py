@@ -51,6 +51,21 @@ class EmployeeAdditionalRoleLink(SQLModel, table=True):
     role: Optional["AdditionalRole"] = Relationship(back_populates="employees")
     
 # --- Employee Table ---
+class EmployeeIncrementBase(SQLModel):
+    employee_id: str = Field(foreign_key="employee.id", nullable=False)
+    increment_amount: float
+    effective_date: date
+    notes: Optional[str] = Field(default=None)
+
+
+class EmployeeIncrement(EmployeeIncrementBase, table=True):
+    __tablename__ = "employee_increment_history"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    # Relationship back to Employee (ensure Employee model defines increments)
+    employee: Optional["Employee"] = Relationship(back_populates="increments")
+
 class EmployeeBase(SQLModel):
     employee_id: str = Field(...,unique=True)
     name: str
@@ -88,3 +103,4 @@ class Employee(EmployeeBase, table=True):
 
     # ✅ Relationship: optional roles, many-to-many
     additional_roles: List[EmployeeAdditionalRoleLink] = Relationship(back_populates="employee")
+    increments: list[EmployeeIncrement] = Relationship(back_populates="employee")

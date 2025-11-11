@@ -1,4 +1,4 @@
-from datetime import datetime, timezone, date
+from datetime import date
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship, select, Session
 
@@ -19,6 +19,9 @@ class Admin(AdminBase, table=True):
     __tablename__ = "admin"
 
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
+    
+    
+    
 
 
 # --- Additional Roles Table ---
@@ -52,7 +55,7 @@ class EmployeeAdditionalRoleLink(SQLModel, table=True):
     
 # --- Employee Table ---
 class EmployeeIncrementBase(SQLModel):
-    employee_id: str = Field(foreign_key="employee.id", nullable=False)
+    employee_id: int = Field(foreign_key="employee.id", nullable=False)
     increment_amount: float
     effective_date: date
     notes: Optional[str] = Field(default=None)
@@ -66,8 +69,10 @@ class EmployeeIncrement(EmployeeIncrementBase, table=True):
     # Relationship back to Employee (ensure Employee model defines increments)
     employee: Optional["Employee"] = Relationship(back_populates="increments")
 
+
+
 class EmployeeBase(SQLModel):
-    employee_id: str = Field(...,unique=True)
+    employee_id: str
     name: str
     bank_name: str
     bank_account_title: str
@@ -91,16 +96,58 @@ class EmployeeBase(SQLModel):
     actual_date_of_birth: Optional[date] = None
     hobbies: Optional[str] = None
     vehicle_registration_number: Optional[str] = None
-    company_id: int = Field(foreign_key="admin.id")
-    
-    
+
+
 class Employee(EmployeeBase, table=True):
     __tablename__ = "employee"
 
-    # 🔑 employee_id is now the PRIMARY KEY
+    # 🔑 Primary key
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
-    status: bool = Field(default=True)
+    
+    # 🏢 Move company_id here
+    company_id: int = Field(foreign_key="admin.id")
 
-    # ✅ Relationship: optional roles, many-to-many
-    additional_roles: List[EmployeeAdditionalRoleLink] = Relationship(back_populates="employee")
-    increments: list[EmployeeIncrement] = Relationship(back_populates="employee")
+    # ✅ Additional fields and relationships
+    status: bool = Field(default=True)
+    additional_roles: List["EmployeeAdditionalRoleLink"] = Relationship(back_populates="employee")
+    increments: List["EmployeeIncrement"] = Relationship(back_populates="employee")
+
+# --- Finance Category Table ---
+class FinanceCategoryBase(SQLModel):
+    category_name: str = Field(..., min_length=1)
+    color_code: str = Field(..., min_length=1)
+
+
+class FinanceCategory(FinanceCategoryBase, table=True):
+    __tablename__ = "finance_categories"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    company_id: int = Field(foreign_key="admin.id")  # company creating this category
+
+    # Relationship with Finance
+    finances: List["Finance"] = Relationship(back_populates="category")
+
+
+# --- Finance Table ---
+class FinanceBase(SQLModel):
+    date: date = Field(default_factory=date.today) # pyright: ignore[reportInvalidTypeForm]
+    description: str = Field(..., min_length=1)
+    amount: float = Field(..., ge=0)
+    tax_deductions: float = Field(default=0.0, ge=0)
+    cheque_number: Optional[str] = Field(default=None)
+    category_id: int = Field(...) # input category
+
+
+class Finance(FinanceBase, table=True):
+    __tablename__ = "finance"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    company_id: int = Field(foreign_key="admin.id")  # company creating this record
+    added_by: int = Field(foreign_key="admin.id")  # keep this
+
+    # Relationships
+    category: Optional["FinanceCategory"] = Relationship(back_populates="finances")
+    company: Optional["Admin"] = Relationship(back_populates="finances")
+    added_by_admin: Optional["Admin"] = Relationship(
+        sa_relationship_kwargs={"foreign_keys": "Finance.added_by"}
+    )

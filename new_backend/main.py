@@ -3,7 +3,7 @@ from sqlmodel import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta, date
 import admin_db, auth, employee_db, increment_db
-from models import AdminBase, AdminResponse, EmployeeBase, AdditionalRoleBase, EmployeeIncrement
+from models import AdminBase, AdminResponse, EmployeeBase, AdditionalRoleBase, EmployeeIncrementBase
 from typing import Optional
 
 app = FastAPI(title="Celestials Management System")
@@ -103,7 +103,7 @@ def update_roles(employee_id: str, lst: list[AdditionalRoleBase], current_admin:
 
 # Under Working..........
 @router_login.post("create_increment")
-def create_increment_in_db(new_increment: EmployeeIncrement, session: Session = Depends(admin_db.get_session), 
+def create_increment_in_db(new_increment: EmployeeIncrementBase, session: Session = Depends(admin_db.get_session), 
                            current_admin: AdminBase = Depends(auth.get_current_user)):
     return increment_db.create_increment_in_db(new_increment, session)
 
@@ -113,7 +113,7 @@ def get_increments(employee_id: str, session: Session = Depends(admin_db.get_ses
     return increment_db.get_increments_in_db(employee_id, session)
 
 @router_login.patch("update_increment")
-def update_increment(new_increment: EmployeeIncrement, session: Session = Depends(admin_db.get_session),
+def update_increment(new_increment: EmployeeIncrementBase, session: Session = Depends(admin_db.get_session),
                      current_admin: AdminBase = Depends(auth.get_current_user)):
     return increment_db.update_increment_in_db(new_increment, session)
 

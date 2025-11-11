@@ -26,12 +26,17 @@ def register_new_employee_in_db(employee, lst, current_admin, session):
             raise HTTPException(status_code=400, detail=f"Enter {field}")
 
     # Check for existing employee
-    existing = session.exec(select(Employee).where(Employee.employee_id == employee.employee_id)).first()
+    existing = session.exec(
+        select(Employee)
+        .where(
+            Employee.employee_id == employee.employee_id,
+            Employee.company_id == current_admin.id
+        )
+    ).first()
     if existing:
         raise HTTPException(status_code=400, detail="Employee already exists")
 
-    # Set company and default salary
-    employee.company_id = current_admin.id
+    # Set default salary
     if employee.current_base_salary == 0:
         employee.current_base_salary = employee.initial_base_salary
 
@@ -41,6 +46,7 @@ def register_new_employee_in_db(employee, lst, current_admin, session):
 
     # Save employee
     addemployee = Employee.model_validate(employee)
+    addemployee.company_id = current_admin.id
     session.add(addemployee)
     session.commit()
     session.refresh(addemployee)

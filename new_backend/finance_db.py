@@ -1,0 +1,110 @@
+from typing import Optional
+from fastapi import HTTPException
+from sqlmodel import Session, select
+from datetime import date
+from models import FinanceCategory, Finance
+
+
+def create_finance_in_db(finance, session, currectadmin):
+    existing = session.exec(select(Finance).where(Finance.cheque_number == finance.cheque_number)).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Finance already exists")
+    if finance.description == 'string':
+        raise HTTPException(status_code=400, detail="Enter Description")
+    if finance.amount == 0:
+        raise HTTPException(status_code=400, detail="Enter Amount")
+    if finance.cheque_number == 'string':
+        raise HTTPException(status_code=400, detail="Enter Cheque Number")
+    if finance.category_id == 0:
+        raise HTTPException(status_code=400, detail="Enter Category ID")
+    new_finance = Finance.model_validate(finance)
+    new_finance.company_id = currectadmin.id
+    new_finance.added_by = currectadmin.id
+    session.add(new_finance)
+    session.commit()
+    session.refresh(new_finance)
+    return new_finance
+
+def edit_finance_record_in_db(finance, session, currentadmin):
+    existing = session.exec(select(Finance).where(Finance.cheque_number == finance.cheque_number)).first()
+    if not existing:
+        raise HTTPException(status_code=404, detail="Finance does not exists")
+    if existing.company_id != currentadmin.id:
+        raise HTTPException(status_code=404, detail="Method not Allowed for this Record")
+    if finance.description != 'string':
+        existing.description = finance.description
+    if finance.amount != 0:
+        existing.amount = finance.amount
+    if finance.cheque_number != 'string':
+        existing.cheque_number = finance.cheque_number
+    if finance.category_id != 0:
+        existing.category_id = finance.category_id
+    
+    session.commit()
+    session.refresh(existing)
+    return existing
+
+def delete_finance_record_in_db(cheque_no, session, currentadmin):
+    existing = session.exec(select(Finance).where(Finance.cheque_number == cheque_no)).first()
+    if not existing:
+        raise HTTPException(status_code=404, detail="Finance does not exists")
+    if existing.company_id != currentadmin.id:
+        raise HTTPException(status_code=404, detail="Method not Allowed for this Record")
+    session.delete(existing)
+    session.commit()
+    session.refresh(existing)
+    return {"Message": "Deleted Successfully"}
+
+# Under Working
+def get_finance_records_in_db(page, page_size, start_date, end_date, category_id, session, current_admin):
+    """
+    Get finance records with filters and pagination + summary
+    """
+
+    # Base query for this admin
+    query = select(Finance).where(Finance.company_id == current_admin.id)
+
+    # Apply date filter
+    if start_date:
+        query = query.where(Finance.date >= start_date)
+    if end_date:
+        query = query.where(Finance.date <= end_date)
+
+    # Apply category filter
+    if category_id:
+        query = query.where(Finance.category_id == category_id)
+
+    all_records = session.exec(query).all()
+    total_count = len(all_records)
+
+    # Pagination
+    offset = (page - 1) * page_size
+    paginated_records = all_records[offset:offset + page_size]
+
+    if not paginated_records:
+        raise HTTPException(status_code=404, detail="No finance records found for this query")
+
+    # --- Summary calculations ---
+    total_earnings = sum(f.amount for f in all_records)
+    total_salaries = sum(f.amount for f in all_records if f.category_id == 1)  # Assuming 1 = Salaries
+    total_expenses = sum(f.amount for f in all_records if f.category_id in [3,4,7,8])  # Non-salary expenses
+    total_profit = total_earnings - total_salaries - total_expenses
+
+    return {
+        "page": page,
+        "page_size": page_size,
+        "total_count": total_count,
+        "total_pages": (total_count + page_size - 1) // page_size,
+        "filters": {
+            "start_date": str(start_date) if start_date else "All",
+            "end_date": str(end_date) if end_date else "All",
+            "category_id": category_id if category_id else "All",
+        },
+        "records": paginated_records,
+        "summary": {
+            "total_earnings": total_earnings,
+            "total_salaries": total_salaries,
+            "total_expenses": total_expenses,
+            "total_profit": total_profit
+        }
+    }

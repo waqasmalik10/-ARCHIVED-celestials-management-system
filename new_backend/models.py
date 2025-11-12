@@ -105,49 +105,38 @@ class Employee(EmployeeBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
     
     # 🏢 Move company_id here
-    company_id: int = Field(foreign_key="admin.id")
+    company_id: Optional[int] = Field(default=None, foreign_key="admin.id")
 
     # ✅ Additional fields and relationships
     status: bool = Field(default=True)
     additional_roles: List["EmployeeAdditionalRoleLink"] = Relationship(back_populates="employee")
     increments: List["EmployeeIncrement"] = Relationship(back_populates="employee")
 
-# --- Finance Category Table ---
+# --- Finance Models ---
+
 class FinanceCategoryBase(SQLModel):
-    category_name: str = Field(..., min_length=1)
-    color_code: str = Field(..., min_length=1)
+    category_name: str
+    color_code: str
+    
+class FinanceCategory(FinanceCategoryBase, table = True):
+    
+    category_id: Optional[int] = Field(default=None, primary_key=True, index=True)
+    company_id: Optional[int] = Field(foreign_key='admin.id')
 
 
-class FinanceCategory(FinanceCategoryBase, table=True):
-    __tablename__ = "finance_categories"
-
-    id: Optional[int] = Field(default=None, primary_key=True)
-    company_id: int = Field(foreign_key="admin.id")  # company creating this category
-
-    # Relationship with Finance
-    finances: List["Finance"] = Relationship(back_populates="category")
-
-
-# --- Finance Table ---
 class FinanceBase(SQLModel):
-    date: date = Field(default_factory=date.today) # pyright: ignore[reportInvalidTypeForm]
-    description: str = Field(..., min_length=1)
-    amount: float = Field(..., ge=0)
-    tax_deductions: float = Field(default=0.0, ge=0)
-    cheque_number: Optional[str] = Field(default=None)
-    category_id: int = Field(...) # input category
+    date: date
+    description: str
+    amount: float
+    tax_deductions: float
+    cheque_number: str
+    category_id: int
 
 
-class Finance(FinanceBase, table=True):
-    __tablename__ = "finance"
-
-    id: Optional[int] = Field(default=None, primary_key=True)
-    company_id: int = Field(foreign_key="admin.id")  # company creating this record
-    added_by: int = Field(foreign_key="admin.id")  # keep this
-
-    # Relationships
-    category: Optional["FinanceCategory"] = Relationship(back_populates="finances")
-    company: Optional["Admin"] = Relationship(back_populates="finances")
-    added_by_admin: Optional["Admin"] = Relationship(
-        sa_relationship_kwargs={"foreign_keys": "Finance.added_by"}
-    )
+class Finance(FinanceBase, table = True):
+    
+    id: Optional[int] = Field(default=None, primary_key=True, index=True)
+    added_by: Optional[int] = Field(default = None, foreign_key='admin.id', nullable=True)
+    company_id: Optional[int] = Field(default=None, foreign_key='admin.id', nullable=True)
+    
+    

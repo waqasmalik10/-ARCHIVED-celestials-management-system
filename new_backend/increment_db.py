@@ -1,10 +1,9 @@
 from typing import List, Optional
 from fastapi import HTTPException
-from sqlmodel import Session, select
+from sqlmodel import select
 from datetime import date
 from models import EmployeeIncrement, Employee
 
-# Under Working..............
 
 # ---------------- CREATE ----------------
 def create_increment_in_db(new_increment, session):

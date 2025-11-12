@@ -1,7 +1,7 @@
-from sqlmodel import create_engine, Session, select
-from fastapi import HTTPException, status, Depends
-from typing import List
-from models import AdminBase, Admin, Employee, AdditionalRoleBase, AdditionalRole, EmployeeAdditionalRoleLink
+from sqlmodel import create_engine, select
+from pydantic import field_validator
+from fastapi import HTTPException
+from models import Employee, EmployeeBase, AdditionalRole, EmployeeAdditionalRoleLink
 from datetime import date
 
 import load_env
@@ -24,6 +24,7 @@ def register_new_employee_in_db(employee, lst, current_admin, session):
         value = employee_data.get(field)
         if value in ("string", "", None, 0, str(date.today()), date.today()):
             raise HTTPException(status_code=400, detail=f"Enter {field}")
+
 
     # Check for existing employee
     existing = session.exec(
@@ -57,8 +58,6 @@ def register_new_employee_in_db(employee, lst, current_admin, session):
             break
         role = AdditionalRole.model_validate(role_data)
         session.add(role)
-        session.commit()
-        session.refresh(role)
 
         link = EmployeeAdditionalRoleLink(
             employee_id=addemployee.employee_id,
@@ -66,7 +65,9 @@ def register_new_employee_in_db(employee, lst, current_admin, session):
         )
         session.add(link)
 
+    
     session.commit()
+    session.refresh(role)
     session.refresh(addemployee)
 
     return {"message": "Employee Added Successfully", "employee": addemployee, "Additional Roles": lst}
@@ -174,12 +175,8 @@ def update_roles_in_db(employee_id, lst, current_admin, session):
         select(EmployeeAdditionalRoleLink)
         .where(EmployeeAdditionalRoleLink.employee_id == employee_id)
     ).all()
-    print(current_links)
 
     current_role_ids = [link.role_id for link in current_links]
-    print(type(current_role_ids))
-    
-    print(current_role_ids)
     
     # --- assuming the ideal scenario that we have count(old_roles) == count(new_roles)
     for id in range(len(current_role_ids)):

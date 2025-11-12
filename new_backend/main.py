@@ -2,8 +2,8 @@ from fastapi import FastAPI, Depends, HTTPException, APIRouter, Request
 from sqlmodel import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta, date
-import admin_db, auth, employee_db, increment_db
-from models import AdminBase, AdminResponse, EmployeeBase, AdditionalRoleBase, EmployeeIncrementBase
+import admin_db, auth, employee_db, increment_db, finance_db
+from models import AdminBase, AdminResponse, EmployeeBase, AdditionalRoleBase, EmployeeIncrementBase, FinanceBase
 from typing import Optional
 
 app = FastAPI(title="Celestials Management System")
@@ -101,7 +101,6 @@ def update_roles(employee_id: str, lst: list[AdditionalRoleBase], current_admin:
                  session: Session = Depends(admin_db.get_session)):
     return employee_db.update_roles_in_db(employee_id, lst, current_admin, session)
 
-# Under Working..........
 @router_login.post("create_increment")
 def create_increment_in_db(new_increment: EmployeeIncrementBase, session: Session = Depends(admin_db.get_session), 
                            current_admin: AdminBase = Depends(auth.get_current_user)):
@@ -122,5 +121,29 @@ def delete_increment(employee_id: str, session: Session = Depends(admin_db.get_s
                      current_admin: AdminBase = Depends(auth.get_current_user)):
     return increment_db.delete_increment_in_db(employee_id, session)
 
+finance_router = APIRouter(prefix="/finance")
+
+@finance_router.post("/create_finance_record")
+def create_finance(finance: FinanceBase, session: Session = Depends(admin_db.get_session),
+                     current_admin: AdminBase = Depends(auth.get_current_user)):
+    return finance_db.create_finance_in_db(finance, session, current_admin)
+
+@finance_router.patch("/edit_finance_record")
+def edit_finance_record(finance: FinanceBase, session: Session = Depends(admin_db.get_session),
+                     current_admin: AdminBase = Depends(auth.get_current_user)):
+    return finance_db.edit_finance_record_in_db(finance, session, current_admin)
+
+@finance_router.delete("/delete_finance_record")
+def delete_finance_record(cheque_no: str, session: Session = Depends(admin_db.get_session),
+                     current_admin: AdminBase = Depends(auth.get_current_user)):
+    return finance_db.delete_finance_record_in_db(cheque_no, session, current_admin)
+
+# Under Working-------------
+@finance_router.get("/get_finance_records")
+def get_finance_records(page: int = 1, page_size: int = 10, start_date: Optional[date] = None,
+                        end_date: Optional[date] = None, category_id: Optional[int] = None,
+                        session: Session = Depends(admin_db.get_session), current_admin: AdminBase = Depends(auth.get_current_user)):
+    return finance_db.get_finance_records_in_db(page, page_size, start_date, end_date, category_id, session, current_admin)
 
 app.include_router(router_login)
+app.include_router(finance_router)

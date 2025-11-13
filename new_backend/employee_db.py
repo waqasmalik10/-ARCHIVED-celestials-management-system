@@ -64,10 +64,11 @@ def register_new_employee_in_db(employee, lst, current_admin, session):
             role_id=role.id
         )
         session.add(link)
+        session.commit()
+        session.refresh(role)
 
     
     session.commit()
-    session.refresh(role)
     session.refresh(addemployee)
 
     return {"message": "Employee Added Successfully", "employee": addemployee, "Additional Roles": lst}

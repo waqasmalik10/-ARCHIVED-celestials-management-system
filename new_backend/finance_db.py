@@ -1,12 +1,15 @@
-from typing import Optional
 from fastapi import HTTPException
-from sqlmodel import Session, select
-from datetime import date
-from models import FinanceCategory, Finance
+from sqlmodel import select
+from models import Finance
 
 
-def create_finance_in_db(finance, session, currectadmin):
-    existing = session.exec(select(Finance).where(Finance.cheque_number == finance.cheque_number)).first()
+def create_finance_in_db(finance, session, currentadmin):
+    existing = session.exec(select(Finance).where(
+        Finance.cheque_number == finance.cheque_number,
+        Finance.date == finance.date,
+        Finance.amount == finance.amount,
+        Finance.company_id == currentadmin.id
+        )).first()
     if existing:
         raise HTTPException(status_code=400, detail="Finance already exists")
     if finance.description == 'string':
@@ -18,8 +21,8 @@ def create_finance_in_db(finance, session, currectadmin):
     if finance.category_id == 0:
         raise HTTPException(status_code=400, detail="Enter Category ID")
     new_finance = Finance.model_validate(finance)
-    new_finance.company_id = currectadmin.id
-    new_finance.added_by = currectadmin.id
+    new_finance.company_id = currentadmin.id
+    new_finance.added_by = currentadmin.id
     session.add(new_finance)
     session.commit()
     session.refresh(new_finance)
@@ -55,7 +58,6 @@ def delete_finance_record_in_db(cheque_no, session, currentadmin):
     session.refresh(existing)
     return {"Message": "Deleted Successfully"}
 
-# Under Working
 def get_finance_records_in_db(page, page_size, start_date, end_date, category_id, session, current_admin):
     """
     Get finance records with filters and pagination + summary

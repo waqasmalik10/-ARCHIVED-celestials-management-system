@@ -1,6 +1,16 @@
 from datetime import date
 from typing import Optional, List
-from sqlmodel import SQLModel, Field, Relationship, select, Session
+from sqlmodel import SQLModel, Field, Relationship
+
+class Company(SQLModel, table= True):
+    __tablename__ = 'company'
+    id: Optional[int] = Field(default=None, primary_key=True, index=True)
+    company_id: str = Field(..., unique=True, min_length=1)
+    company_name: str = Field(..., min_length=1)
+    website: str = Field(..., min_length=1)
+    address: str = Field(..., min_length=1)
+    phone: str = Field(..., min_length=1)
+    email: str = Field(..., min_length=1)
 
 
 class AdminResponse(SQLModel):
@@ -42,12 +52,8 @@ class EmployeeAdditionalRoleLink(SQLModel, table=True):
     __tablename__ = "employee_additional_roles"
 
     # Use employee_id as foreign key to employee table (PK)
-    employee_id: str = Field(
-        foreign_key="employee.employee_id", primary_key=True
-    )
-    role_id: int = Field(
-        foreign_key="additional_roles.id", primary_key=True
-    )
+    employee_id: str = Field(foreign_key="employee.employee_id", primary_key=True)
+    role_id: int = Field(foreign_key="additional_roles.id", primary_key=True)
 
     # Relationships
     employee: Optional["Employee"] = Relationship(back_populates="additional_roles")
@@ -55,7 +61,7 @@ class EmployeeAdditionalRoleLink(SQLModel, table=True):
     
 # --- Employee Table ---
 class EmployeeIncrementBase(SQLModel):
-    employee_id: int = Field(foreign_key="employee.id", nullable=False)
+    employee_id: str = Field(foreign_key="employee.employee_id", nullable=False)
     increment_amount: float
     effective_date: date
     notes: Optional[str] = Field(default=None)
@@ -139,4 +145,17 @@ class Finance(FinanceBase, table = True):
     added_by: Optional[int] = Field(default = None, foreign_key='admin.id', nullable=True)
     company_id: Optional[int] = Field(default=None, foreign_key='admin.id', nullable=True)
     
+
+# --- Inventory Management ---
+
+class StoreBase(SQLModel):
+    name: str = Field(..., min_length=1, index=True)
+    unique_identifier: str = Field(..., unique=True)
+    description: Optional[str] = Field(default=None)
+
+
+class Store(StoreBase, table = True):
+    __tablename__ = "store"
     
+    id: Optional[int] = Field(default=None, primary_key=True, index=True)
+    company_id: Optional[int] = Field(foreign_key="admin.id")

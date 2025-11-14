@@ -1,8 +1,6 @@
 from sqlmodel import create_engine, Session, select
-from fastapi import HTTPException, status, Depends
-from typing import List
-from models import AdminBase, Admin, Employee, AdditionalRoleBase, AdditionalRole, EmployeeAdditionalRoleLink
-from datetime import date
+from fastapi import HTTPException
+from models import Admin, Company
 
 import load_env
 
@@ -20,6 +18,24 @@ def get_db():
     with Session(engine) as session:
         yield session
 
+def register_company_in_db(company, session):
+    if company.company_id == 'string':
+        raise HTTPException(status_code=400, detail="Enter company_id")
+    if company.company_name == 'string':
+        raise HTTPException(status_code=400, detail="Enter company_name")
+    if company.website == 'string':
+        raise HTTPException(status_code=400, detail="Enter website")
+    if company.address == 'string':
+        raise HTTPException(status_code=400, detail="Enter address")
+    if company.phone == 'string':
+        raise HTTPException(status_code=400, detail="Enter phone")
+    if company.email == 'string':
+        raise HTTPException(status_code=400, detail="Enter email")
+    company = Company.model_validate(company)
+    session.add(company)
+    session.commit()
+    session.refresh(company)
+    return company
 
 def create_admin_in_db(admin, session):
     if admin.company_name == 'string':

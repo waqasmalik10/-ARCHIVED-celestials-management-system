@@ -4,14 +4,12 @@ from sqlmodel import SQLModel, Field, Relationship
 
 class Company(SQLModel, table= True):
     __tablename__ = 'company'
-    id: Optional[int] = Field(default=None, primary_key=True, index=True)
-    company_id: str = Field(..., unique=True, min_length=1)
+    company_id: str = Field(...,primary_key=True, unique=True, min_length=1)
     company_name: str = Field(..., min_length=1)
     website: str = Field(..., min_length=1)
     address: str = Field(..., min_length=1)
     phone: str = Field(..., min_length=1)
     email: str = Field(..., min_length=1)
-
 
 class AdminResponse(SQLModel):
     company_name: str = Field(..., min_length=1)
@@ -55,7 +53,6 @@ class EmployeeAdditionalRoleLink(SQLModel, table=True):
     employee_id: str = Field(foreign_key="employee.employee_id", primary_key=True)
     role_id: int = Field(foreign_key="additional_roles.id", primary_key=True)
 
-    # Relationships
     employee: Optional["Employee"] = Relationship(back_populates="additional_roles")
     role: Optional["AdditionalRole"] = Relationship(back_populates="employees")
     
@@ -107,13 +104,10 @@ class EmployeeBase(SQLModel):
 class Employee(EmployeeBase, table=True):
     __tablename__ = "employee"
 
-    # 🔑 Primary key
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
     
-    # 🏢 Move company_id here
-    company_id: Optional[int] = Field(default=None, foreign_key="admin.id")
+    company_id: Optional[int] = Field(default=None, foreign_key="company.company_id")
 
-    # ✅ Additional fields and relationships
     status: bool = Field(default=True)
     additional_roles: List["EmployeeAdditionalRoleLink"] = Relationship(back_populates="employee")
     increments: List["EmployeeIncrement"] = Relationship(back_populates="employee")
@@ -127,7 +121,7 @@ class FinanceCategoryBase(SQLModel):
 class FinanceCategory(FinanceCategoryBase, table = True):
     
     category_id: Optional[int] = Field(default=None, primary_key=True, index=True)
-    company_id: Optional[int] = Field(foreign_key='admin.id')
+    company_id: Optional[int] = Field(foreign_key='company.company_id')
 
 
 class FinanceBase(SQLModel):
@@ -143,13 +137,13 @@ class Finance(FinanceBase, table = True):
     
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
     added_by: Optional[int] = Field(default = None, foreign_key='admin.id', nullable=True)
-    company_id: Optional[int] = Field(default=None, foreign_key='admin.id', nullable=True)
+    company_id: Optional[int] = Field(default=None, foreign_key='company.company_id', nullable=True)
     
 
 # --- Inventory Management ---
 
 class StoreBase(SQLModel):
-    name: str = Field(..., min_length=1, index=True)
+    name: str = Field(..., min_length=1)
     unique_identifier: str = Field(..., unique=True)
     description: Optional[str] = Field(default=None)
 
@@ -158,4 +152,13 @@ class Store(StoreBase, table = True):
     __tablename__ = "store"
     
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
-    company_id: Optional[int] = Field(foreign_key="admin.id")
+    company_id: Optional[int] = Field(foreign_key="company.company_id")
+
+class CaetegoryBase(SQLModel):
+    name: str = Field(..., min_length=1)
+    description: str
+    store_id: str = Field(foreign_key="store.id")
+
+class Category(CaetegoryBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True, index=True)
+    company_id: Optional[int] = Field(foreign_key="company.company_id")

@@ -28,3 +28,30 @@ def update_store_details_in_db(store, session, currentadmin):
     session.commit()
     session.refresh(existing)
     return existing
+
+def get_all_stores_in_db(page, page_size, session, currentadmin):
+    query = select(Store).where(Store.company_id == currentadmin.id)
+    all_stores = session.exec(query).all()
+    total_count = len(all_stores)
+
+    offset = (page - 1) * page_size
+    paginated_stores = all_stores[offset:offset + page_size]
+
+    if not paginated_stores:
+        raise HTTPException(status_code=404, detail="No stores found for this query")
+
+    return {
+        "page": page,
+        "page_size": page_size,
+        "total_count": total_count,
+        "total_pages": (total_count + page_size - 1) // page_size,
+        "stores": paginated_stores
+    }
+
+def get_store_by_id_in_db(store_id, session, currentadmin):
+    store = session.exec(select(Store).where(Store.unique_identifier == store_id)).first()
+    if not store:
+        raise HTTPException(status_code=404, detail="Store not found")
+    if store.company_id != currentadmin.id:
+        raise HTTPException(status_code=403, detail="Method not allowed for this store")
+    return store

@@ -3,7 +3,7 @@ from sqlmodel import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta, date
 import admin_db, auth, employee_db, increment_db, finance_db, store_db
-from models import AdminBase, AdminResponse, EmployeeBase, AdditionalRoleBase, EmployeeIncrementBase, FinanceBase, StoreBase
+from models import CompanyBase, AdminBase, AdminResponse, EmployeeBase, AdditionalRoleBase, EmployeeIncrementBase, FinanceBase, StoreBase
 from typing import Optional
 
 app = FastAPI(title="Celestials Management System")
@@ -30,14 +30,14 @@ async def auto_auth_middleware(request: Request, call_next):
     response = await call_next(request)
     return response
 
+@app.post("/register_company", status_code=201)
+def register_company(company: CompanyBase, session=Depends(admin_db.get_session)):
+    return admin_db.register_company_in_db(company, session)
 
 router_login = APIRouter(prefix="/admin")
 
-
 @router_login.post("/login")
-def company_login(form_data: OAuth2PasswordRequestForm = Depends(),
-                  session=Depends(admin_db.get_session),
-                  request: Request = None):
+def company_login(form_data: OAuth2PasswordRequestForm = Depends(),session=Depends(admin_db.get_session),request: Request = None):
     admin = auth.authenticate_admin(session, form_data.username, form_data.password)
     if not admin or admin.password != form_data.password:
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -155,6 +155,16 @@ def create_newstore(store: StoreBase, session: Session = Depends(admin_db.get_se
 def update_store_details(store: StoreBase, session: Session = Depends(admin_db.get_session),
                  current_admin: AdminBase = Depends(auth.get_current_user)):
     return store_db.update_store_details_in_db(store, session, current_admin)
+
+@store_router.post("/get_all_stores")
+def get_all_stores(page: int, page_size: int, session: Session = Depends(admin_db.get_session),
+                 current_admin: AdminBase = Depends(auth.get_current_user)):
+    return store_db.get_all_stores_in_db(page, page_size, session, current_admin)
+
+@store_router.post("/get_store_by_id")
+def get_store_by_id(store_id: str, session: Session = Depends(admin_db.get_session),
+                 current_admin: AdminBase = Depends(auth.get_current_user)):
+    return store_db.get_store_by_id_in_db(store_id, session, current_admin)
 
 
 app.include_router(router_login)

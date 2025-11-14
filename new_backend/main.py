@@ -53,13 +53,13 @@ def company_login(form_data: OAuth2PasswordRequestForm = Depends(),
 
 
 
-@app.post("/register_admin")
+@app.post("/register_admin", status_code=201)
 def register_admin(admin: AdminBase, session: Session = Depends(admin_db.get_session)):
     admin_db.create_admin_in_db(admin, session)
     return 'Admin Created successfully'
 
 
-@app.get("/company_profile")
+@router_login.get("/company_profile")
 def get_company_profile(admin: AdminBase = Depends(auth.get_current_user)):
     print(admin.company_name)
     return {"Comapany Name": admin.company_name, "Website": admin.website, "Address": admin.address, "Phone No.": admin.phone, "Email" : admin.email}
@@ -101,22 +101,22 @@ def update_roles(employee_id: str, lst: list[AdditionalRoleBase], current_admin:
                  session: Session = Depends(admin_db.get_session)):
     return employee_db.update_roles_in_db(employee_id, lst, current_admin, session)
 
-@router_login.post("create_increment")
+@router_login.post("/create_increment")
 def create_increment_in_db(new_increment: EmployeeIncrementBase, session: Session = Depends(admin_db.get_session), 
                            current_admin: AdminBase = Depends(auth.get_current_user)):
     return increment_db.create_increment_in_db(new_increment, session)
 
-@router_login.get("get_increments")
+@router_login.get("/get_increments")
 def get_increments(employee_id: str, session: Session = Depends(admin_db.get_session),
                    current_admin: AdminBase = Depends(auth.get_current_user)):
     return increment_db.get_increments_in_db(employee_id, session)
 
-@router_login.patch("update_increment")
+@router_login.patch("/update_increment")
 def update_increment(new_increment: EmployeeIncrementBase, session: Session = Depends(admin_db.get_session),
                      current_admin: AdminBase = Depends(auth.get_current_user)):
     return increment_db.update_increment_in_db(new_increment, session)
 
-@router_login.put("delete_increment")
+@router_login.put("/delete_increment")
 def delete_increment(employee_id: str, session: Session = Depends(admin_db.get_session),
                      current_admin: AdminBase = Depends(auth.get_current_user)):
     return increment_db.delete_increment_in_db(employee_id, session)
@@ -144,12 +144,19 @@ def get_finance_records(page: int = 1, page_size: int = 10, start_date: Optional
                         session: Session = Depends(admin_db.get_session), current_admin: AdminBase = Depends(auth.get_current_user)):
     return finance_db.get_finance_records_in_db(page, page_size, start_date, end_date, category_id, session, current_admin)
 
+store_router = APIRouter(prefix='/store')
 
-@app.post("/create_newstore")
+@store_router.post("/newstore")
 def create_newstore(store: StoreBase, session: Session = Depends(admin_db.get_session),
                  current_admin: AdminBase = Depends(auth.get_current_user)):
     return store_db.create_newstore_in_db(store, session, current_admin)
 
+@store_router.post("/update_store")
+def update_store_details(store: StoreBase, session: Session = Depends(admin_db.get_session),
+                 current_admin: AdminBase = Depends(auth.get_current_user)):
+    return store_db.update_store_details_in_db(store, session, current_admin)
+
 
 app.include_router(router_login)
 app.include_router(finance_router)
+app.include_router(store_router)

@@ -38,13 +38,16 @@ def create_admin_in_db(admin, session):
         select(Admin).where(Admin.email == admin.email)).first()
 
     if existing:
-        raise HTTPException(status_code=400, detail="User already exists")
+        raise HTTPException(status_code=409, detail="User already exists")
 
     db_admin = Admin.model_validate(admin)
     session.add(db_admin)
     session.commit()
     session.refresh(db_admin)
-    return db_admin
+    return {
+        "message": "Admin created successfully",
+        "admin": db_admin
+    }
 
 
 def update_company_profile_in_db(admin, current_admin, session):
@@ -59,18 +62,16 @@ def update_company_profile_in_db(admin, current_admin, session):
     if admin.email != 'string':
         current_admin.email = admin.email
     
-    session.add(admin)
     session.commit()
-    session.refresh(admin)
+    session.refresh(current_admin)
     return admin
 
 
 def update_password_in_db(old, new, current_admin, session):
     if old == current_admin.password:
         current_admin.password = new
-        session.add(current_admin)
         session.commit()
         session.refresh(current_admin)
         return "Password Update"
     else:
-        raise HTTPException(status_code=400, detail="Not Allowed")
+        raise HTTPException(status_code=403, detail="Provided password is wrong")

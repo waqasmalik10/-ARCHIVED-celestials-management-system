@@ -35,7 +35,7 @@ def register_new_employee_in_db(employee, lst, current_admin, session):
         )
     ).first()
     if existing:
-        raise HTTPException(status_code=400, detail="Employee already exists")
+        raise HTTPException(status_code=409, detail="Employee already exists")
 
     # Set default salary
     if employee.current_base_salary == 0:
@@ -58,6 +58,7 @@ def register_new_employee_in_db(employee, lst, current_admin, session):
             break
         role = AdditionalRole.model_validate(role_data)
         session.add(role)
+        session.commit()
 
         link = EmployeeAdditionalRoleLink(
             employee_id=addemployee.employee_id,
@@ -71,7 +72,7 @@ def register_new_employee_in_db(employee, lst, current_admin, session):
     session.commit()
     session.refresh(addemployee)
 
-    return {"message": "Employee Added Successfully", "employee": addemployee, "Additional Roles": lst}
+    return {"message": "Employee Added Successfully", "employee": addemployee}
 
 
 def update_employee_details_in_db(employee, current_admin, session):
@@ -83,10 +84,10 @@ def update_employee_details_in_db(employee, current_admin, session):
     ).first()
 
     if not employee_to_update:
-        raise HTTPException(status_code=400, detail="Employee does not exist")
+        raise HTTPException(status_code=404, detail="Employee does not exist")
 
     if employee_to_update.company_id != current_admin.id:
-        raise HTTPException(status_code=400, detail="Method not allowed for this employee")
+        raise HTTPException(status_code=403, detail="Method not allowed for this employee")
 
     # --- Update base employee fields ---
     employee_data = employee.dict(exclude_unset=True, exclude_defaults=True)
@@ -112,15 +113,15 @@ def deactivate_employee_in_db(employee_id, current_admin, session):
     ).first()
 
     if not employee_to_update:
-        raise HTTPException(status_code=400, detail="Employee does not exist")
+        raise HTTPException(status_code=404, detail="Employee does not exist")
 
     if employee_to_update.company_id != current_admin.id:
-        raise HTTPException(status_code=400, detail="Method not allowed for this employee")
+        raise HTTPException(status_code=403, detail="Method not allowed for this employee")
     
     employee_to_update.status = False
     session.commit()
     session.refresh(employee_to_update)
-    return {"Mesasage" : "Employee has been Seactivated", "Employee" : employee_to_update.employee_id, "Status": employee_to_update.status}
+    return {"Mesasage" : "Employee has been Deactivated", "Employee" : employee_to_update.employee_id, "Status": employee_to_update.status}
 
 def display_all_employee_in_db(page, page_size, department, team, current_admin, session):
     

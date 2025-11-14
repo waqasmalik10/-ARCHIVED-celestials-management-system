@@ -11,7 +11,7 @@ def create_finance_in_db(finance, session, currentadmin):
         Finance.company_id == currentadmin.id
         )).first()
     if existing:
-        raise HTTPException(status_code=400, detail="Finance already exists")
+        raise HTTPException(status_code=409, detail="Finance Record already exists")
     if finance.description == 'string':
         raise HTTPException(status_code=400, detail="Enter Description")
     if finance.amount == 0:
@@ -31,9 +31,9 @@ def create_finance_in_db(finance, session, currentadmin):
 def edit_finance_record_in_db(finance, session, currentadmin):
     existing = session.exec(select(Finance).where(Finance.cheque_number == finance.cheque_number)).first()
     if not existing:
-        raise HTTPException(status_code=404, detail="Finance does not exists")
+        raise HTTPException(status_code=404, detail="Finance Record does not exists")
     if existing.company_id != currentadmin.id:
-        raise HTTPException(status_code=404, detail="Method not Allowed for this Record")
+        raise HTTPException(status_code=403, detail="Method not Allowed for this Record")
     if finance.description != 'string':
         existing.description = finance.description
     if finance.amount != 0:
@@ -50,19 +50,16 @@ def edit_finance_record_in_db(finance, session, currentadmin):
 def delete_finance_record_in_db(cheque_no, session, currentadmin):
     existing = session.exec(select(Finance).where(Finance.cheque_number == cheque_no)).first()
     if not existing:
-        raise HTTPException(status_code=404, detail="Finance does not exists")
+        raise HTTPException(status_code=404, detail="Finance Record does not exists")
     if existing.company_id != currentadmin.id:
-        raise HTTPException(status_code=404, detail="Method not Allowed for this Record")
+        raise HTTPException(status_code=403, detail="Method not Allowed for this Record")
     session.delete(existing)
     session.commit()
     session.refresh(existing)
     return {"Message": "Deleted Successfully"}
 
 def get_finance_records_in_db(page, page_size, start_date, end_date, category_id, session, current_admin):
-    """
-    Get finance records with filters and pagination + summary
-    """
-
+    
     # Base query for this admin
     query = select(Finance).where(Finance.company_id == current_admin.id)
 
@@ -88,7 +85,7 @@ def get_finance_records_in_db(page, page_size, start_date, end_date, category_id
 
     # --- Summary calculations ---
     total_earnings = sum(f.amount for f in all_records)
-    total_salaries = sum(f.amount for f in all_records if f.category_id == 1)  # Assuming 1 = Salaries
+    total_salaries = sum(f.amount for f in all_records if f.category_id == 1) 
     total_expenses = sum(f.amount for f in all_records if f.category_id in [3,4,7,8])  # Non-salary expenses
     total_profit = total_earnings - total_salaries - total_expenses
 

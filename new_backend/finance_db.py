@@ -1,14 +1,19 @@
 from fastapi import HTTPException
 from sqlmodel import select
-from models import Finance
+from models import Finance, Company
 
 
-def create_finance_in_db(finance, session, currentadmin):
+def create_finance_in_db(finance, session, current_admin):
+    
+    company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
+    
     existing = session.exec(select(Finance).where(
         Finance.cheque_number == finance.cheque_number,
         Finance.date == finance.date,
         Finance.amount == finance.amount,
-        Finance.company_id == currentadmin.id
+        Finance.company_id == company.company_id
         )).first()
     if existing:
         raise HTTPException(status_code=409, detail="Finance Record already exists")
@@ -21,19 +26,26 @@ def create_finance_in_db(finance, session, currentadmin):
     if finance.category_id == 0:
         raise HTTPException(status_code=400, detail="Enter Category ID")
     new_finance = Finance.model_validate(finance)
-    new_finance.company_id = currentadmin.id
-    new_finance.added_by = currentadmin.id
+    new_finance.company_id = company.company_id
+    new_finance.added_by = current_admin.id
     session.add(new_finance)
     session.commit()
     session.refresh(new_finance)
     return new_finance
 
 def edit_finance_record_in_db(finance, session, currentadmin):
-    existing = session.exec(select(Finance).where(Finance.cheque_number == finance.cheque_number)).first()
+    
+    if (finance.cheque_number) == 'string':
+        raise HTTPException(status_code=400, detail="Enter Cheque Number")
+    
+    company = session.exec(select(Company).where(Company.company_name == currentadmin.company_name)).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
+    
+    existing = session.exec(select(Finance).where(Finance.cheque_number == finance.cheque_number,
+                                                  Finance.company_id == company.company_id)).first()
     if not existing:
         raise HTTPException(status_code=404, detail="Finance Record does not exists")
-    if existing.company_id != currentadmin.id:
-        raise HTTPException(status_code=403, detail="Method not Allowed for this Record")
     if finance.description != 'string':
         existing.description = finance.description
     if finance.amount != 0:
@@ -48,20 +60,24 @@ def edit_finance_record_in_db(finance, session, currentadmin):
     return existing
 
 def delete_finance_record_in_db(cheque_no, session, currentadmin):
-    existing = session.exec(select(Finance).where(Finance.cheque_number == cheque_no)).first()
+    company = session.exec(select(Company).where(Company.company_name == currentadmin.company_name,)).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
+    
+    existing = session.exec(select(Finance).where(Finance.cheque_number == cheque_no,
+                                                  Finance.company_id == company.company_id)).first()
     if not existing:
         raise HTTPException(status_code=404, detail="Finance Record does not exists")
-    if existing.company_id != currentadmin.id:
-        raise HTTPException(status_code=403, detail="Method not Allowed for this Record")
     session.delete(existing)
     session.commit()
-    session.refresh(existing)
     return {"Message": "Deleted Successfully"}
 
 def get_finance_records_in_db(page, page_size, start_date, end_date, category_id, session, current_admin):
-    
+    company = session.exec(select(Company).where(Company.company_name == current_admin.company_name,)).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
     # Base query for this admin
-    query = select(Finance).where(Finance.company_id == current_admin.id)
+    query = select(Finance).where(Finance.company_id == company.company_id)
 
     # Apply date filter
     if start_date:

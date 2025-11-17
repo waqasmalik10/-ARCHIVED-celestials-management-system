@@ -18,7 +18,6 @@ class AdminResponse(SQLModel):
     phone: str = Field(..., min_length=1)
     email: str = Field(..., min_length=1)
 
-
 class AdminBase(AdminResponse):
     password: str = Field(..., min_length=1)
 
@@ -27,10 +26,6 @@ class Admin(AdminBase, table=True):
     __tablename__ = "admin"
 
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
-    
-    
-    
-
 
 # --- Additional Roles Table ---
 class AdditionalRoleBase(SQLModel):
@@ -68,6 +63,7 @@ class EmployeeIncrement(EmployeeIncrementBase, table=True):
     __tablename__ = "employee_increment_history"
 
     id: Optional[int] = Field(default=None, primary_key=True)
+    company_id: Optional[str] = Field(default=None, foreign_key="company.company_id")
 
     # Relationship back to Employee (ensure Employee model defines increments)
     employee: Optional["Employee"] = Relationship(back_populates="increments")

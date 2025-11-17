@@ -66,21 +66,27 @@ def create_admin_in_db(admin, session):
     }
 
 
-def update_company_profile_in_db(admin, current_admin, session):
-    if admin.company_name != 'string':
-        current_admin.company_name = admin.company_name
-    if admin.website != 'string':
-        current_admin.website = admin.website
-    if admin.address != 'string':
-        current_admin.address = admin.address
-    if admin.phone != 'string':
-        current_admin.phone = admin.phone
-    if admin.email != 'string':
-        current_admin.email = admin.email
+def update_company_profile_in_db(company, session, current_admin):
+    existing = session.exec(
+        select(Company).where(Company.company_id == company.company_id)).first()
+    if not existing:
+        raise HTTPException(status_code=404, detail="Company Does not exists")
+    if existing.company_name != current_admin.company_name:
+        raise HTTPException(status_code=403, detail="Method not allowed for this Company")
+    if company.company_name != 'string':
+        existing.company_name = company.company_name
+    if company.website != 'string':
+        existing.website = company.website
+    if company.address != 'string':
+        existing.address = company.address
+    if company.phone != 'string':
+        existing.phone = company.phone
+    if company.email != 'string':
+        existing.email = company.email
     
     session.commit()
-    session.refresh(current_admin)
-    return admin
+    session.refresh(existing)
+    return existing
 
 
 def update_password_in_db(old, new, current_admin, session):

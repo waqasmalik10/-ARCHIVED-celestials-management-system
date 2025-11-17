@@ -1,7 +1,7 @@
 from sqlmodel import create_engine, select
 from pydantic import field_validator
 from fastapi import HTTPException
-from models import Employee, EmployeeBase, AdditionalRole, EmployeeAdditionalRoleLink
+from models import Employee, Company, AdditionalRole, EmployeeAdditionalRoleLink
 from datetime import date
 
 import load_env
@@ -25,15 +25,13 @@ def register_new_employee_in_db(employee, lst, current_admin, session):
         if value in ("string", "", None, 0, str(date.today()), date.today()):
             raise HTTPException(status_code=400, detail=f"Enter {field}")
 
-
+    company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
     # Check for existing employee
     existing = session.exec(
-        select(Employee)
-        .where(
-            Employee.employee_id == employee.employee_id,
-            Employee.company_id == current_admin.id
-        )
-    ).first()
+        select(Employee).where(Employee.employee_id == employee.employee_id, Employee.company_id == company.company_id)
+        ).first()
     if existing:
         raise HTTPException(status_code=409, detail="Employee already exists")
 
@@ -46,11 +44,11 @@ def register_new_employee_in_db(employee, lst, current_admin, session):
         employee.actual_date_of_birth = employee.date_of_birth
 
     # Save employee
-    addemployee = Employee.model_validate(employee)
-    addemployee.company_id = current_admin.id
-    session.add(addemployee)
+    employee = Employee.model_validate(employee)
+    employee.company_id = company.company_id
+    session.add(employee)
     session.commit()
-    session.refresh(addemployee)
+    session.refresh(employee)
 
     # Handle additional roles
     for role_data in lst:
@@ -61,7 +59,7 @@ def register_new_employee_in_db(employee, lst, current_admin, session):
         session.commit()
 
         link = EmployeeAdditionalRoleLink(
-            employee_id=addemployee.employee_id,
+            employee_id=employee.employee_id,
             role_id=role.id
         )
         session.add(link)
@@ -70,24 +68,26 @@ def register_new_employee_in_db(employee, lst, current_admin, session):
 
     
     session.commit()
-    session.refresh(addemployee)
+    session.refresh(employee)
 
-    return {"message": "Employee Added Successfully", "employee": addemployee}
-
+    return {"message": "Employee Added Successfully", "employee": employee.employee_id}
 
 def update_employee_details_in_db(employee, current_admin, session):
-    if employee.employee_id == "string":
-        raise HTTPException(status_code=400, detail="Enter employee_id")
-
+    company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
+    # Check for existing employee
     employee_to_update = session.exec(
-        select(Employee).where(Employee.employee_id == employee.employee_id)
-    ).first()
+        select(Employee).where(Employee.employee_id == employee.employee_id, Employee.company_id == company.company_id)).first()
 
     if not employee_to_update:
         raise HTTPException(status_code=404, detail="Employee does not exist")
 
-    if employee_to_update.company_id != current_admin.id:
-        raise HTTPException(status_code=403, detail="Method not allowed for this employee")
+    if not employee_to_update.status:
+        raise HTTPException(status_code=404, detail="Employee is deativated")
+    
+    if employee_to_update.company_id != company.company_id:
+        raise HTTPException(status_code=403, detail="Method not allowed for this employee because you are not admin of this employee")
 
     # --- Update base employee fields ---
     employee_data = employee.dict(exclude_unset=True, exclude_defaults=True)
@@ -96,36 +96,43 @@ def update_employee_details_in_db(employee, current_admin, session):
             setattr(employee_to_update, key, value)
 
     # --- Finalize DB transaction ---
-    session.add(employee_to_update)
     session.commit()
     session.refresh(employee_to_update)
 
     return {"message": "Employee updated successfully", "employee": employee_to_update}
 
-
 def deactivate_employee_in_db(employee_id, current_admin, session):
-    
     if employee_id == "string":
         raise HTTPException(status_code=400, detail="Enter employee_id")
 
+    company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
+    # Check for existing employee
     employee_to_update = session.exec(
-        select(Employee).where(Employee.employee_id == employee_id)
-    ).first()
-
+        select(Employee).where(Employee.employee_id == employee_id, Employee.company_id == company.company_id)).first()
+    
     if not employee_to_update:
         raise HTTPException(status_code=404, detail="Employee does not exist")
+    
+    if not employee_to_update.status:
+        raise HTTPException(status_code=404, detail="Employee is already deativated")
 
-    if employee_to_update.company_id != current_admin.id:
+    if employee_to_update.company_id != company.company_id:
         raise HTTPException(status_code=403, detail="Method not allowed for this employee")
     
     employee_to_update.status = False
     session.commit()
     session.refresh(employee_to_update)
-    return {"Mesasage" : "Employee has been Deactivated", "Employee" : employee_to_update.employee_id, "Status": employee_to_update.status}
+    return {"Mesasage" : "Employee has been Deactivated", "Employee" : employee_to_update.employee_id, "Status": "Deactivated"}
 
 def display_all_employee_in_db(page, page_size, department, team, current_admin, session):
     
-    query = select(Employee).where(Employee.company_id == current_admin.id)
+    company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
+    
+    query = select(Employee).where(Employee.company_id == company.id, Employee.status == True)
 
     # Apply filters dynamically
     if department:
@@ -156,37 +163,58 @@ def display_all_employee_in_db(page, page_size, department, team, current_admin,
         "employees": paginated_employees,
     }
 
-
 def update_roles_in_db(employee_id, lst, current_admin, session):
     if employee_id == "string":
         raise HTTPException(status_code=400, detail="Enter employee_id")
 
-    # --- Get employee ---
+    # Get company of admin
+    company = session.exec(
+        select(Company).where(Company.company_name == current_admin.company_name)
+    ).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
+
+    # Check for existing employee
     employee = session.exec(
-        select(Employee).where(Employee.employee_id == employee_id)
+        select(Employee).where(Employee.employee_id == employee_id, Employee.company_id == company.company_id)
     ).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
 
-    # --- Validate admin ownership ---
-    if employee.company_id != current_admin.id:
-        raise HTTPException(status_code=403, detail="You are not authorized to update this employee")
+    if not employee.status:
+        raise HTTPException(status_code=404, detail="Employee is deactivated")
 
-    # --- Get all current roles linked to this employee ---
-    current_links = session.exec(
-        select(EmployeeAdditionalRoleLink)
-        .where(EmployeeAdditionalRoleLink.employee_id == employee_id)
+    # --- Delete existing role links and roles ---
+    existing_links = session.exec(
+        select(EmployeeAdditionalRoleLink).where(EmployeeAdditionalRoleLink.employee_id == employee_id)
     ).all()
 
-    current_role_ids = [link.role_id for link in current_links]
-    
-    # --- assuming the ideal scenario that we have count(old_roles) == count(new_roles)
-    for id in range(len(current_role_ids)):
-        role = session.exec(select(AdditionalRole).where(AdditionalRole.id == current_role_ids[id])).first()
-        role.role_name = lst[id].role_name
-        role.role_description = lst[id].role_description
-    
+    for link in existing_links:
+        # Delete linked role first
+        role = session.exec(select(AdditionalRole).where(AdditionalRole.id == link.role_id)).first()
+        if role:
+            session.delete(role)
+        # Delete link
+        session.delete(link)
+
     session.commit()
-    session.refresh(role)
-    
-    return {"Mesaage": "Role Updated", "Roles": lst}
+
+    # --- Add new roles and links ---
+    for role_data in lst:
+        new_role = AdditionalRole(
+            role_name=role_data.role_name,
+            role_description=role_data.role_description
+        )
+        session.add(new_role)
+        session.commit()  # commit to get new_role.id
+        session.refresh(new_role)
+
+        new_link = EmployeeAdditionalRoleLink(
+            employee_id=employee_id,
+            role_id=new_role.id
+        )
+        session.add(new_link)
+
+    session.commit()
+
+    return {"Message": "Roles Updated", "Roles": lst}

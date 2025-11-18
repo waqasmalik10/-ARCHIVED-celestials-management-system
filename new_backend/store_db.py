@@ -68,3 +68,6 @@ def get_store_by_id_in_db(store_id, session, current_admin):
     if not store:
         raise HTTPException(status_code=404, detail="Store not found")
     return store
+
+def Create_new_Category_for_store_items_in_db(itemcategory, session, current_admin):
+    return

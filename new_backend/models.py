@@ -150,11 +150,25 @@ class Store(StoreBase, table = True):
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
     company_id: Optional[int] = Field(default=None, foreign_key="company.company_id")
 
-class CaetegoryBase(SQLModel):
+class ItemCategoryBase(SQLModel):
     name: str = Field(..., min_length=1)
     description: str
     store_id: str = Field(foreign_key="store.id")
 
-class Category(CaetegoryBase, table=True):
+class ItemCategory(ItemCategoryBase, table=True):
+    __tablename__ = "item_category"
+    
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
     company_id: Optional[int] = Field(foreign_key="company.company_id")
+
+
+class StoreItemsBase(SQLModel):
+    name: str = Field(..., min_length=1)
+    description: Optional[str] = Field(default=None)
+    quantity: int
+    category_id: str = Field(foreign_key="item_category.id")
+    store_id: Optional[int] = Field(foreign_key="store.id")
+class StoreItems(StoreItemsBase, table=True):
+    __tablename__ = "store_items"
+    
+    id: Optional[int] = Field(default=None, primary_key=True, index=True)

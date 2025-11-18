@@ -3,7 +3,7 @@ from sqlmodel import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta, date
 import admin_db, auth, employee_db, increment_db, finance_db, store_db
-from models import Company, AdminBase, AdminResponse, EmployeeBase, AdditionalRoleBase, EmployeeIncrementBase, FinanceBase, StoreBase
+from models import Company, AdminBase, AdminResponse, EmployeeBase, AdditionalRoleBase, EmployeeIncrementBase, FinanceBase, StoreBase, ItemCategoryBase, StoreItemsBase
 from typing import Optional
 
 app = FastAPI(title="Celestials Management System")
@@ -168,6 +168,10 @@ def get_store_by_id(store_id: str, session: Session = Depends(admin_db.get_sessi
                  current_admin: AdminBase = Depends(auth.get_current_user)):
     return store_db.get_store_by_id_in_db(store_id, session, current_admin)
 
+@store_router.post("/create_category_for_store_items")
+def create_category_for_store_items(itemcategory: ItemCategoryBase, session: Session = Depends(admin_db.get_session),
+                                    current_admin: AdminBase = Depends(auth.get_current_user)):
+    return store_db.Create_new_Category_for_store_items_in_db(itemcategory, session, current_admin)
 
 app.include_router(router_login)
 app.include_router(finance_router)

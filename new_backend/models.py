@@ -140,7 +140,7 @@ class Finance(FinanceBase, table = True):
 
 class StoreBase(SQLModel):
     name: str = Field(..., min_length=1)
-    unique_identifier: str = Field(..., unique=True)
+    unique_identifier: str = Field(...,min_length=1)
     description: Optional[str] = Field(default=None)
 
 
@@ -148,7 +148,7 @@ class Store(StoreBase, table = True):
     __tablename__ = "store"
     
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
-    company_id: Optional[int] = Field(foreign_key="company.company_id")
+    company_id: Optional[int] = Field(default=None, foreign_key="company.company_id")
 
 class CaetegoryBase(SQLModel):
     name: str = Field(..., min_length=1)

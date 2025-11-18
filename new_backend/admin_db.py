@@ -31,6 +31,7 @@ def register_company_in_db(company, session):
         raise HTTPException(status_code=400, detail="Enter phone")
     if company.email == 'string':
         raise HTTPException(status_code=400, detail="Enter email")
+    existing = session.exec(select(Company).where(Company.company_id == company.company_id))
     company = Company.model_validate(company)
     session.add(company)
     session.commit()
@@ -51,7 +52,8 @@ def create_admin_in_db(admin, session):
     if admin.password == 'string':
         raise HTTPException(status_code=400, detail="Enter password")
     existing = session.exec(
-        select(Admin).where(Admin.email == admin.email)).first()
+        select(Admin).where(Admin.email == admin.email,
+                            Admin.company_name == admin.company_name)).first()
 
     if existing:
         raise HTTPException(status_code=409, detail="User already exists")

@@ -195,7 +195,7 @@ const Form = () => {
                             />
                         </div>
                         <div
-                            className={`bodyBackground absolute top-[132px] z-90 w-full rounded-[15px] overflow-hidden shadow-xl right-0 ${selectTheCategory ? "block" : "hidden"
+                            className={`bodyBackground absolute top-[132px] z-[9999] w-full rounded-[15px] overflow-hidden shadow-xl right-0 ${selectTheCategory ? "block" : "hidden"
                                 }`}
                         >
                             <ul>
@@ -206,7 +206,7 @@ const Form = () => {
                                         <Button
                                             type="button"
                                             onClick={() => selectingTheCategory(item)}
-                                            buttonClasses="border-b border-solid border-[#FFFFFF21] px-5 py-2.5 text-white"
+                                            buttonClasses="border-b border-solid border-[#FFFFFF21] px-5 py-2.5 text-white w-full"
                                         >
                                             {item.name}
                                         </Button>

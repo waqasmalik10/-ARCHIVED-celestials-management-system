@@ -15,7 +15,7 @@ export interface FinanaceListData {
 }
 
 export interface FinanceCategoriesData {
-  id?: number;
+  id?: string;
   name: string;
   colorCode?: string,
   companyId?: number

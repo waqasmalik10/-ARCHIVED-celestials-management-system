@@ -10,6 +10,11 @@ import NewFinancePage from "../pages/NewFinancePage";
 import UpdateFinancePage from "../pages/UpdateFinancePage";
 import CategoryListsPage from "../pages/CategoryListsPage";
 import NewCategoryPage from "../pages/NewCategoryPage";
+import UpdateCategoryPage from "../pages/UpdateCategoryPage";
+import InventoryBodyPage from "../pages/InventoryBodyPage";
+import StorePage from "../pages/StorePage";
+import NewStorePage from "../pages/NewStorePage";
+import InventoryCategoriesPage from "pages/InventoryCategoriesPage";
 
 interface UserPageProps {
   name: string;
@@ -27,7 +32,7 @@ export default function UserPage({ superAdmin }: UserPageProps) {
           </>
         )} */}
         <Route path="/" element={<Dashboard />} />
-        <Route path="/employees" element={<EmployeesPage />} /> 
+        <Route path="/employees" element={<EmployeesPage />} />
         <Route path="/employees/register-employees" element={<RegisterEmployeesPage />} />
         <Route path="/employees/update-employees/:employeeId" element={<UpdateEmployeesPage />} />
         <Route path="/employees/increament-history/:employeeId" element={<IncreamentHistoryPage />} />
@@ -36,6 +41,10 @@ export default function UserPage({ superAdmin }: UserPageProps) {
         <Route path="/finance/update-finance/:financeId" element={<UpdateFinancePage />} />
         <Route path="/finance/category-lists" element={<CategoryListsPage />} />
         <Route path="/finance/category-lists/new-category" element={<NewCategoryPage />} />
+        <Route path="/finance/category-lists/update-category/:categoryId" element={<UpdateCategoryPage />} />
+        <Route path="/inventory" element={<InventoryBodyPage />} />
+        <Route path="/inventory/stores" element={<StorePage />} />
+        <Route path="/inventory/new-store" element={<NewStorePage />} />
         <Route path="/settings" element={<Setting />} />
       </Routes>
 

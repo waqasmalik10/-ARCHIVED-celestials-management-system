@@ -6,6 +6,7 @@ import swapIcon from "../assets/images/swapIcon.svg";
 import liquidityIcon from "../assets/images/liquidity.svg";
 import companyPolicy from "../assets/images/companyPolicyIcon.svg";
 import financeIcon from "../assets/images/finanaceIcon.svg"
+import registerIcon from "../assets/images/register.svg"
 import settingsIcon from "../assets/images/settingsIcon.svg";
 import settingIcon from "../assets/images/settingIcon.svg";
 import { useNavigate } from "react-router-dom";
@@ -27,6 +28,7 @@ export default function SideBar(props: SideBarProps) {
   const [activeDashboard, setActiveDashboard] = useState(false);
   const [activeEmpoyees, setActiveEmployees] = useState(false);
   const [activeFinance, setActiveFinance] = useState(false)
+  const [activeInventory, setActiveInventory] = useState(false)
   const [activeSettings, setActiveSettings] = useState(false);
   const [activeDepartments, setActiveDepartments] = useState(false);
   const [activePolicy, setActivePolicy] = useState(false);
@@ -52,6 +54,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveDepartments(false);
       setActivePolicy(false);
       setActiveFinance(false)
+      setActiveInventory(false)
       // setLeaves(false);
       // setLoan(false);
     } else if (location.pathname === "/settings") {
@@ -61,6 +64,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveDepartments(false);
       setActivePolicy(false);
       setActiveFinance(false)
+      setActiveInventory(false)
       // setLeaves(false);
       // setLoan(false);
     } else if (
@@ -73,9 +77,10 @@ export default function SideBar(props: SideBarProps) {
       setActiveDepartments(false);
       setActivePolicy(false);
       setActiveFinance(false)
+      setActiveInventory(false)
       // setLeaves(false);
       // setLoan(false);
-    }  else if (
+    } else if (
       location.pathname === "/finance" ||
       location.pathname.startsWith("/finance")
     ) {
@@ -85,6 +90,20 @@ export default function SideBar(props: SideBarProps) {
       setActiveDepartments(false);
       setActivePolicy(false);
       setActiveFinance(true)
+      setActiveInventory(false)
+      // setLeaves(false);
+      // setLoan(false);
+    } else if (
+      location.pathname === "/inventory" ||
+      location.pathname.startsWith("/inventory")
+    ) {
+      setActiveDashboard(false);
+      setActiveSettings(false);
+      setActiveEmployees(false);
+      setActiveDepartments(false);
+      setActivePolicy(false);
+      setActiveFinance(false)
+      setActiveInventory(true)
       // setLeaves(false);
       // setLoan(false);
     } else if (
@@ -96,6 +115,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveEmployees(false);
       setActiveDepartments(true);
       setActivePolicy(false);
+      setActiveInventory(false)
       // setLeaves(false);
       // setLoan(false);
     } else if (location.pathname === "/policy") {
@@ -105,6 +125,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveDepartments(false);
       setActivePolicy(true);
       setActiveFinance(false)
+      setActiveInventory(false)
       // setLeaves(false);
       // setLoan(false);
     } else if (location.pathname === "/leaves") {
@@ -114,6 +135,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveDepartments(false);
       setActivePolicy(false);
       setActiveFinance(false)
+      setActiveInventory(false)
       // setLeaves(true);
       // setLoan(false);
     } else if (location.pathname === "/loan") {
@@ -123,6 +145,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveDepartments(false);
       setActivePolicy(false);
       setActiveFinance(false)
+      setActiveInventory(false)
       // setLeaves(false);
       // setLoan(true);
     } else {
@@ -132,6 +155,7 @@ export default function SideBar(props: SideBarProps) {
       setActiveDepartments(false);
       setActivePolicy(false);
       setActiveFinance(false)
+      setActiveInventory(false)
       // setLeaves(false);
       // setLoan(false);
     }
@@ -148,6 +172,9 @@ export default function SideBar(props: SideBarProps) {
   };
   const navigateFinance = () => {
     navigate("/finance")
+  };
+  const navigateInventory = () => {
+    navigate("/inventory")
   };
   const navigateDepartments = () => {
     navigate("/departments");
@@ -170,7 +197,7 @@ export default function SideBar(props: SideBarProps) {
     {
       label: "Swap",
       icon: swapIcon,
-      onClick: () => {},
+      onClick: () => { },
       active: false,
       show: true,
     },
@@ -188,7 +215,13 @@ export default function SideBar(props: SideBarProps) {
       active: activeFinance,
       show: props.superAdmin,
     },
-
+    {
+      label: "Inventory",
+      icon: registerIcon,
+      onClick: navigateInventory,
+      active: activeInventory,
+      show: props.superAdmin,
+    },
     {
       label: "Departments",
       icon: departmentsIcon,
@@ -199,7 +232,7 @@ export default function SideBar(props: SideBarProps) {
     {
       label: "Liquidity",
       icon: liquidityIcon,
-      onClick: () => {},
+      onClick: () => { },
       active: false,
       show: true,
     },
@@ -243,9 +276,8 @@ export default function SideBar(props: SideBarProps) {
               <Button
                 key={button.label}
                 onClick={button.onClick}
-                buttonClasses={`!w-full !pl-7 md:!pl-[50px] !pr-2.5 !h-[67px] !font-poppins !text-white !text-sm sm:text-base !text-left relative !flex !justify-start w-full items-center gap-[22px] ${
-                  button.active ? activeClass : "bg-transparent !font-medium"
-                }`}
+                buttonClasses={`!w-full !pl-7 md:!pl-[50px] !pr-2.5 !h-[67px] !font-poppins !text-white !text-sm sm:text-base !text-left relative !flex !justify-start w-full items-center gap-[22px] ${button.active ? activeClass : "bg-transparent !font-medium"
+                  }`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 {button.active && (

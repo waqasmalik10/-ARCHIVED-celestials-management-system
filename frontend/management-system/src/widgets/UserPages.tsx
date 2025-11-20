@@ -45,6 +45,7 @@ export default function UserPage({ superAdmin }: UserPageProps) {
         <Route path="/inventory" element={<InventoryBodyPage />} />
         <Route path="/inventory/stores" element={<StorePage />} />
         <Route path="/inventory/new-store" element={<NewStorePage />} />
+        <Route path="/inventory/categories" element={<InventoryCategoriesPage/>} />
         <Route path="/settings" element={<Setting />} />
       </Routes>
 

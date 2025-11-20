@@ -2,8 +2,8 @@ from fastapi import FastAPI, Depends, HTTPException, APIRouter, Request
 from sqlmodel import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta, date
-import admin_db, auth, employee_db, increment_db, finance_db, store_db
-from models import Company, AdminBase, AdminResponse, EmployeeBase, AdditionalRoleBase, EmployeeIncrementBase, FinanceBase, StoreBase, ItemCategoryBase, StoreItemsBase
+import admin_db, auth, employee_db, increment_db, finance_db, store_db, team_db
+from models import Company, AdminBase, EmployeeBase, AdditionalRoleBase, EmployeeIncrementBase, FinanceBase, StoreBase, ItemCategoryBase, StoreItemsBase, TeamBase
 from typing import Optional
 
 app = FastAPI(title="Celestials Management System")
@@ -34,9 +34,9 @@ async def auto_auth_middleware(request: Request, call_next):
 def register_company(company: Company, session=Depends(admin_db.get_session)):
     return admin_db.register_company_in_db(company, session)
 
-router_login = APIRouter(prefix="/admin")
+admin_router = APIRouter(prefix="/admin")
 
-@router_login.post("/login")
+@admin_router.post("/login")
 def company_login(form_data: OAuth2PasswordRequestForm = Depends(),session=Depends(admin_db.get_session),
                   request: Request = None):
     admin = auth.authenticate_admin(session, form_data.username, form_data.password)
@@ -60,65 +60,65 @@ def register_admin(admin: AdminBase, session: Session = Depends(admin_db.get_ses
     return 'Admin Created successfully'
 
 
-@router_login.get("/company_profile")
+@admin_router.get("/company_profile")
 def get_company_profile(admin: AdminBase = Depends(auth.get_current_user)):
     return {"Comapany Name": admin.company_name, "Website": admin.website,
             "Address": admin.address, "Phone No.": admin.phone, "Email" : admin.email}
 
 
-@router_login.put("/update_company_profile")
+@admin_router.put("/update_company_profile")
 def update_company_profile(company: Company,
                            current_admin: AdminBase = Depends(auth.get_current_user),
                            session: Session = Depends(admin_db.get_session)):
     return admin_db.update_company_profile_in_db(company, session, current_admin)
 
 
-@router_login.patch("/update_password")
+@admin_router.patch("/update_password")
 def update_password(old:str, new: str, current_admin: AdminBase = Depends(auth.get_current_user),
                     session: Session = Depends(admin_db.get_session)):
     return admin_db.update_password_in_db(old, new, current_admin, session)
 
 
-@router_login.post("/create_employee")
+@admin_router.post("/create_employee")
 def register_new_employee(employee: EmployeeBase, lst: list[AdditionalRoleBase], current_admin: AdminBase = Depends(auth.get_current_user),
                     session: Session = Depends(admin_db.get_session)):
     return employee_db.register_new_employee_in_db(employee, lst, current_admin, session)
 
-@router_login.patch("/update_employee_details")
+@admin_router.patch("/update_employee_details")
 def update_employee_details(employee: EmployeeBase, current_admin: AdminBase = Depends(auth.get_current_user),
                     session: Session = Depends(admin_db.get_session)):
     return employee_db.update_employee_details_in_db(employee, current_admin, session)
 
-@router_login.patch("/deactivate_employee")
+@admin_router.patch("/deactivate_employee")
 def deactivate_employee(employee_id: str, current_admin: AdminBase = Depends(auth.get_current_user), session: Session = Depends(admin_db.get_session)):
     return employee_db.deactivate_employee_in_db(employee_id, current_admin, session)
 
-@router_login.get("/display all employees")
+@admin_router.get("/display all employees")
 def display_all_employee(page: int = 1, page_size: int = 10, department: Optional[str] = None, team: Optional[str] = None,
                          current_admin: AdminBase = Depends(auth.get_current_user), session: Session = Depends(admin_db.get_session)):
     return employee_db.display_all_employee_in_db(page, page_size, department, team, current_admin, session)
 
-@router_login.put("/Update Roles")
+@admin_router.put("/Update Roles")
 def update_roles(employee_id: str, lst: list[AdditionalRoleBase], current_admin: AdminBase = Depends(auth.get_current_user),
                  session: Session = Depends(admin_db.get_session)):
     return employee_db.update_roles_in_db(employee_id, lst, current_admin, session)
 
-@router_login.post("/create_increment")
+@admin_router.post("/create_increment")
 def create_increment_in_db(new_increment: EmployeeIncrementBase, session: Session = Depends(admin_db.get_session), 
                            current_admin: AdminBase = Depends(auth.get_current_user)):
     return increment_db.create_increment_in_db(new_increment, session, current_admin)
 
-@router_login.get("/get_increments")
+@admin_router.get("/get_increments")
 def get_increment_by_id(employee_id: str, session: Session = Depends(admin_db.get_session),
                    current_admin: AdminBase = Depends(auth.get_current_user)):
     return increment_db.get_increment_by_id_in_db(employee_id, session, current_admin)
 
-@router_login.patch("/update_increment")
+@admin_router.patch("/update_increment")
 def update_increment(new_increment: EmployeeIncrementBase, session: Session = Depends(admin_db.get_session),
                      current_admin: AdminBase = Depends(auth.get_current_user)):
     return increment_db.update_increment_in_db(new_increment, session, current_admin)
 
-@router_login.put("/delete_increment")
+@admin_router.put("/delete_increment")
 def delete_increment(employee_id: str, session: Session = Depends(admin_db.get_session),
                      current_admin: AdminBase = Depends(auth.get_current_user)):
     return increment_db.delete_increment_in_db(employee_id, session, current_admin)
@@ -148,10 +148,17 @@ def get_finance_records(page: int = 1, page_size: int = 10, start_date: Optional
 
 store_router = APIRouter(prefix='/store')
 
+<<<<<<< Updated upstream
 @store_router.post("/newstore")
 def create_newstore(store: StoreBase, session: Session = Depends(admin_db.get_session),
                  current_admin: AdminBase = Depends(auth.get_current_user)):
     return store_db.create_newstore_in_db(store, session, current_admin)
+=======
+@store_router.post("/new_store", status_code=201)
+def create_new_store(store: StoreBase, session: Session = Depends(admin_db.get_session),
+                    current_admin: AdminBase = Depends(auth.get_current_user)):
+    return store_db.create_new_store_in_db(store, session, current_admin)
+>>>>>>> Stashed changes
 
 @store_router.post("/update_store")
 def update_store_details(store: StoreBase, session: Session = Depends(admin_db.get_session),
@@ -168,11 +175,68 @@ def get_store_by_id(store_id: str, session: Session = Depends(admin_db.get_sessi
                  current_admin: AdminBase = Depends(auth.get_current_user)):
     return store_db.get_store_by_id_in_db(store_id, session, current_admin)
 
+<<<<<<< Updated upstream
 @store_router.post("/create_category_for_store_items")
 def create_category_for_store_items(itemcategory: ItemCategoryBase, session: Session = Depends(admin_db.get_session),
+=======
+@store_router.post("/create_category_for_store_items", status_code=201)
+def create_category_for_store_items(item_category: ItemCategoryBase, session: Session = Depends(admin_db.get_session),
+                                    current_admin: AdminBase = Depends(auth.get_current_user)):
+    return store_db.Create_new_Category_for_store_items_in_db(item_category, session, current_admin)
+
+@store_router.patch("/Update_details_of_Category_for_store_items")
+def Update_details_of_Category_for_store_items(item_category_id: int, item_category: ItemCategoryBase, session: Session = Depends(admin_db.get_session),
+                                    current_admin: AdminBase = Depends(auth.get_current_user)):
+    return store_db.Update_details_of_Category_for_store_items_in_db(item_category_id, item_category, session, current_admin)
+
+@store_router.get('/get_category_by_id/{category_id}')
+def get_category_by_id(item_category_id:int, session: Session = Depends(admin_db.get_session),
+                                    current_admin: AdminBase = Depends(auth.get_current_user)):
+    return store_db.get_category_by_id_in_db(item_category_id, session, current_admin)
+
+@store_router.get('/get_all_categories')
+def get_all_categories(page:int, page_size:int, session: Session = Depends(admin_db.get_session),
+                                    current_admin: AdminBase = Depends(auth.get_current_user)):
+    return store_db.get_all_categories_in_db(page, page_size, session, current_admin)
+
+@store_router.post('/Create_store_items')
+def Create_store_items(item: StoreItemsBase, session: Session = Depends(admin_db.get_session),
+>>>>>>> Stashed changes
                                     current_admin: AdminBase = Depends(auth.get_current_user)):
     return store_db.Create_new_Category_for_store_items_in_db(itemcategory, session, current_admin)
 
-app.include_router(router_login)
+@store_router.patch('/Update_store_items_details')
+def Update_store_items_details(item_id: int, item: StoreItemsBase, session: Session = Depends(admin_db.get_session),
+                                    current_admin: AdminBase = Depends(auth.get_current_user)):
+    return store_db.Update_store_items_details_in_db(item_id, item, session, current_admin)
+
+@store_router.get("/get_store_item_by_id/{category_id}")
+def get_store_item_by_id(item_id: int, session: Session = Depends(admin_db.get_session),
+                        current_admin: AdminBase = Depends(auth.get_current_user)):
+    return store_db.get_store_item_by_id_in_db(item_id, session, current_admin)
+
+@store_router.get("/get_store_items")
+def get_store_items_in_db(page:int, page_size:int, session: Session = Depends(admin_db.get_session),
+                            current_admin: AdminBase = Depends(auth.get_current_user)):
+    return store_db.get_store_items_in_db(page, page_size, session, current_admin)
+
+@admin_router.post('/create_team')
+def create_team(team: TeamBase, session: Session = Depends(admin_db.get_session),
+                current_admin: AdminBase = Depends(auth.get_current_user)):
+    return team_db.create_team_in_db(team, session, current_admin)
+
+
+@admin_router.post('/get_team_by_id')
+def get_team_by_id(team_id: int, session: Session = Depends(admin_db.get_session),
+                current_admin: AdminBase = Depends(auth.get_current_user)):
+    return team_db.get_team_by_id_in_db(team_id, session, current_admin)
+
+
+@admin_router.post('/edit_team')
+def edit_team(team_id: int, team: TeamBase, session: Session = Depends(admin_db.get_session),
+                current_admin: AdminBase = Depends(auth.get_current_user)):
+    return team_db.edit_team_in_db(team_id, team, session, current_admin)
+
+app.include_router(admin_router)
 app.include_router(finance_router)
 app.include_router(store_router)

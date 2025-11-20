@@ -172,3 +172,22 @@ class StoreItems(StoreItemsBase, table=True):
     __tablename__ = "store_items"
     
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
+
+
+class TeamBase(SQLModel):
+    name: str = Field(..., min_length=1)
+    description: str = Field(...,min_length=1)
+    team_lead_id: int = Field(foreign_key='employee.id')
+    company_id: str = Field(foreign_key='company.company_id')
+    
+class Team(TeamBase, table=True):
+    __tablename__='team'
+    
+    id: Optional[int] = Field(default=None, primary_key=True, index=True)
+
+class Teams_to_employee(SQLModel, table=True):
+    __tablename__='teams_to_employee'
+    
+    id: Optional[int] = Field(default=None, primary_key=True, index=True)
+    team_id: int = Field(foreign_key='team.id')
+    team_lead_id: int = Field(foreign_key='employee.id')

@@ -1,8 +1,8 @@
-"""updating item Category Table
+"""Updated AdminBase
 
-Revision ID: 65ffa5fd85a2
-Revises: b531baaac048
-Create Date: 2025-11-18 21:47:32.766702
+Revision ID: 8e0277f1c3ad
+Revises: 7ad90fb8e8eb
+Create Date: 2025-11-21 17:57:20.828128
 
 """
 from typing import Sequence, Union
@@ -13,8 +13,8 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision: str = '65ffa5fd85a2'
-down_revision: Union[str, Sequence[str], None] = 'b531baaac048'
+revision: str = '8e0277f1c3ad'
+down_revision: Union[str, Sequence[str], None] = '7ad90fb8e8eb'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

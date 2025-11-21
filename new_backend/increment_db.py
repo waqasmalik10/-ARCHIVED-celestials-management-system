@@ -6,22 +6,30 @@ from models import EmployeeIncrement, Employee, Company
 
 # ---------------- CREATE ----------------
 def create_increment_in_db(new_increment, session, current_admin):
+    # Get company of current admin
     company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
     
-    employee =  session.exec(select(Employee).where(Employee.employee_id == new_increment.employee_id,
-                                                    Employee.company_id == company.company_id)).first()
+    # Get employee for the increment
+    employee =  session.exec(select(Employee).where(
+        Employee.employee_id == new_increment.employee_id,
+        Employee.company_id == company.company_id,
+        Employee.status == True
+    )).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Employee Doesn't Exists")
     
+    # Ensure employee belongs to the admin's company
     if employee.company_id != company.company_id:
         raise HTTPException(status_code=403, detail="There is no Employee with given ID")
     
+    # Check if increment already exists
     existing = session.exec(select(EmployeeIncrement).where(EmployeeIncrement.employee_id == new_increment.employee_id)).first()
     if existing:
         raise HTTPException(status_code=409, detail="Increment already exists")
     
+    # Create and apply increment
     new_increment = EmployeeIncrement.model_validate(new_increment)
     employee.increment_amount = new_increment.increment_amount
     employee.last_increment_date = new_increment.effective_date
@@ -32,27 +40,44 @@ def create_increment_in_db(new_increment, session, current_admin):
     session.refresh(employee)
     return new_increment
 
+
 # ---------------- READ ----------------
 def get_increment_by_id_in_db(employee_id, session, current_admin):
+    # Get company of current admin
     company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
-    Increment = session.exec(select(EmployeeIncrement).where(EmployeeIncrement.employee_id == employee_id,
-                                                             EmployeeIncrement.company_id == company.company_id)).first()
+
+    # Retrieve increment for employee
+    Increment = session.exec(select(EmployeeIncrement).where(
+        EmployeeIncrement.employee_id == employee_id,
+        EmployeeIncrement.company_id == company.company_id
+    )).first()
     if Increment:
         return Increment
+
     raise HTTPException(status_code=404, detail="Increment does not exist")
 
 # ---------------- UPDATE / EDIT ----------------
-def update_increment_in_db(new_increment, session, current_admin):
+def update_increment_in_db(increment_id, new_increment, session, current_admin):
+    # Get company of current admin
     company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
-    increment = session.exec(select(EmployeeIncrement).where(EmployeeIncrement.employee_id == new_increment.employee_id,
-                                                             EmployeeIncrement.company_id == company.company_id)).first()
+    
+    # Retrieve existing increment
+    increment = session.exec(select(EmployeeIncrement).where(
+        EmployeeIncrement.id == increment_id,
+        EmployeeIncrement.employee_id == new_increment.employee_id,
+        EmployeeIncrement.company_id == company.company_id
+    )).first()
     if not increment:
         raise HTTPException(status_code=404, detail="Increment does not exist")
+    
+    # Get employee record
     employee =  session.exec(select(Employee).where(Employee.employee_id == new_increment.employee_id)).first()
+
+    # Update increment amount and adjust employee salary
     if new_increment.increment_amount != 0:
         increment.increment_amount = new_increment.increment_amount
         if new_increment.increment_amount >= employee.increment_amount:
@@ -60,10 +85,13 @@ def update_increment_in_db(new_increment, session, current_admin):
         else:
             employee.current_base_salary -= (employee.increment_amount - new_increment.increment_amount)
         employee.increment_amount = new_increment.increment_amount
+
+    # Update effective date
     if new_increment.effective_date != str(date.today()):
         increment.effective_date = new_increment.effective_date
         employee.last_increment_date = new_increment.effective_date
-        
+
+    # Update notes
     if new_increment.notes != 'string':
         increment.notes = new_increment.notes
 
@@ -72,16 +100,23 @@ def update_increment_in_db(new_increment, session, current_admin):
     session.refresh(employee)
     return increment
 
+
 # ---------------- HARD DELETE ----------------
 def delete_increment_in_db(employee_id, session, current_admin):
+    # Get company of current admin
     company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
-    increment = session.exec(select(EmployeeIncrement).where(EmployeeIncrement.employee_id == employee_id,
-                                                             EmployeeIncrement.company_id == company.company_id)).first()
+    
+    # Retrieve increment record
+    increment = session.exec(select(EmployeeIncrement).where(
+        EmployeeIncrement.employee_id == employee_id,
+        EmployeeIncrement.company_id == company.company_id
+    )).first()
     if not increment:
         raise HTTPException(status_code=404, detail="Increment does not exist")
     
+    # Delete increment
     session.delete(increment)
     session.commit()
     return {"detail": "Increment deleted successfully"}

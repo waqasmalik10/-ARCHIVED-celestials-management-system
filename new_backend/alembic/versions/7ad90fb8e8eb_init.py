@@ -1,8 +1,8 @@
 """init
 
-Revision ID: ad409fa137b3
+Revision ID: 7ad90fb8e8eb
 Revises: 
-Create Date: 2025-11-18 18:04:09.618108
+Create Date: 2025-11-21 17:01:25.408817
 
 """
 from typing import Sequence, Union
@@ -13,7 +13,7 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'ad409fa137b3'
+revision: str = '7ad90fb8e8eb'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -41,15 +41,15 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_admin_id'), 'admin', ['id'], unique=False)
     op.create_table('company',
-    sa.Column('company_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('company_name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('website', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('address', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('phone', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('email', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.PrimaryKeyConstraint('company_id'),
-    sa.UniqueConstraint('company_id')
+    sa.Column('company_id', sa.Integer(), nullable=False),
+    sa.PrimaryKeyConstraint('company_id')
     )
+    op.create_index(op.f('ix_company_company_id'), 'company', ['company_id'], unique=False)
     op.create_table('employee',
     sa.Column('employee_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
@@ -116,17 +116,6 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_store_id'), 'store', ['id'], unique=False)
-    op.create_table('category',
-    sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('store_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('company_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['company_id'], ['company.company_id'], ),
-    sa.ForeignKeyConstraint(['store_id'], ['store.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_category_id'), 'category', ['id'], unique=False)
     op.create_table('employee_additional_roles',
     sa.Column('employee_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('role_id', sa.Integer(), nullable=False),
@@ -140,21 +129,70 @@ def upgrade() -> None:
     sa.Column('effective_date', sa.Date(), nullable=False),
     sa.Column('notes', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('company_id', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+    sa.Column('company_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['company_id'], ['company.company_id'], ),
     sa.ForeignKeyConstraint(['employee_id'], ['employee.employee_id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('item_category',
+    sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('store_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('company_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['company_id'], ['company.company_id'], ),
+    sa.ForeignKeyConstraint(['store_id'], ['store.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_item_category_id'), 'item_category', ['id'], unique=False)
+    op.create_table('team',
+    sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('team_lead_id', sa.Integer(), nullable=False),
+    sa.Column('company_id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['company_id'], ['company.company_id'], ),
+    sa.ForeignKeyConstraint(['team_lead_id'], ['employee.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_team_id'), 'team', ['id'], unique=False)
+    op.create_table('store_items',
+    sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+    sa.Column('quantity', sa.Integer(), nullable=False),
+    sa.Column('category_id', sa.Integer(), nullable=False),
+    sa.Column('store_id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['category_id'], ['item_category.id'], ),
+    sa.ForeignKeyConstraint(['store_id'], ['store.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_store_items_id'), 'store_items', ['id'], unique=False)
+    op.create_table('teams_to_employee',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('team_id', sa.Integer(), nullable=False),
+    sa.Column('team_lead_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['team_id'], ['team.id'], ),
+    sa.ForeignKeyConstraint(['team_lead_id'], ['employee.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_teams_to_employee_id'), 'teams_to_employee', ['id'], unique=False)
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     """Downgrade schema."""
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_index(op.f('ix_teams_to_employee_id'), table_name='teams_to_employee')
+    op.drop_table('teams_to_employee')
+    op.drop_index(op.f('ix_store_items_id'), table_name='store_items')
+    op.drop_table('store_items')
+    op.drop_index(op.f('ix_team_id'), table_name='team')
+    op.drop_table('team')
+    op.drop_index(op.f('ix_item_category_id'), table_name='item_category')
+    op.drop_table('item_category')
     op.drop_table('employee_increment_history')
     op.drop_table('employee_additional_roles')
-    op.drop_index(op.f('ix_category_id'), table_name='category')
-    op.drop_table('category')
     op.drop_index(op.f('ix_store_id'), table_name='store')
     op.drop_table('store')
     op.drop_index(op.f('ix_financecategory_category_id'), table_name='financecategory')
@@ -163,6 +201,7 @@ def downgrade() -> None:
     op.drop_table('finance')
     op.drop_index(op.f('ix_employee_id'), table_name='employee')
     op.drop_table('employee')
+    op.drop_index(op.f('ix_company_company_id'), table_name='company')
     op.drop_table('company')
     op.drop_index(op.f('ix_admin_id'), table_name='admin')
     op.drop_table('admin')

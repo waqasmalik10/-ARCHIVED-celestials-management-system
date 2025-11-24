@@ -41,25 +41,15 @@ def create_finance_in_db(finance, session, current_admin):
 
 
 # --- Edit an existing finance record ---
-def edit_finance_record_in_db(finance, session, currentadmin):
-    # Validate cheque number
-    if finance.cheque_number == 'string':
-        raise HTTPException(status_code=400, detail="Enter Cheque Number")
-
-    # Get company of current admin
-    company = session.exec(select(Company).where(Company.company_name == currentadmin.company_name)).first()
-    if not company:
-        raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
-
+def edit_finance_record_in_db(finance_id, finance, session, currentadmin):
     # Retrieve existing finance record
-    existing = session.exec(select(Finance).where(
-        Finance.cheque_number == finance.cheque_number,
-        Finance.company_id == company.company_id
-    )).first()
+    existing = session.exec(select(Finance).where(Finance.id == finance_id)).first()
     if not existing:
         raise HTTPException(status_code=404, detail="Finance Record does not exists")
 
     # Update fields if valid
+    if finance.tax_deductions != 0:
+        existing.tax_deductions= finance.tax_deductions
     if finance.description != 'string':
         existing.description = finance.description
     if finance.amount != 0:
@@ -75,17 +65,9 @@ def edit_finance_record_in_db(finance, session, currentadmin):
 
 
 # --- Delete a finance record ---
-def delete_finance_record_in_db(cheque_no, session, currentadmin):
-    # Get company of current admin
-    company = session.exec(select(Company).where(Company.company_name == currentadmin.company_name)).first()
-    if not company:
-        raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
-
+def delete_finance_record_in_db(finance_id, session, currentadmin):
     # Retrieve finance record
-    existing = session.exec(select(Finance).where(
-        Finance.cheque_number == cheque_no,
-        Finance.company_id == company.company_id
-    )).first()
+    existing = session.exec(select(Finance).where(Finance.id == finance_id)).first()
     if not existing:
         raise HTTPException(status_code=404, detail="Finance Record does not exists")
 

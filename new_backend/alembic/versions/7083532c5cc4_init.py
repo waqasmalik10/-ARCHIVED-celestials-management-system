@@ -1,8 +1,8 @@
-"""init
+"""INIT
 
-Revision ID: 7ad90fb8e8eb
+Revision ID: 7083532c5cc4
 Revises: 
-Create Date: 2025-11-21 17:01:25.408817
+Create Date: 2025-11-24 21:45:06.887168
 
 """
 from typing import Sequence, Union
@@ -13,7 +13,7 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision: str = '7ad90fb8e8eb'
+revision: str = '7083532c5cc4'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -82,21 +82,6 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_employee_id'), 'employee', ['id'], unique=False)
-    op.create_table('finance',
-    sa.Column('date', sa.Date(), nullable=False),
-    sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('amount', sa.Float(), nullable=False),
-    sa.Column('tax_deductions', sa.Float(), nullable=False),
-    sa.Column('cheque_number', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('category_id', sa.Integer(), nullable=False),
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('added_by', sa.Integer(), nullable=True),
-    sa.Column('company_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['added_by'], ['admin.id'], ),
-    sa.ForeignKeyConstraint(['company_id'], ['company.company_id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_finance_id'), 'finance', ['id'], unique=False)
     op.create_table('financecategory',
     sa.Column('category_name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('color_code', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
@@ -134,6 +119,22 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['employee_id'], ['employee.employee_id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('finance',
+    sa.Column('date', sa.Date(), nullable=False),
+    sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('amount', sa.Float(), nullable=False),
+    sa.Column('tax_deductions', sa.Float(), nullable=False),
+    sa.Column('cheque_number', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('category_id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('added_by', sa.Integer(), nullable=True),
+    sa.Column('company_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['added_by'], ['admin.id'], ),
+    sa.ForeignKeyConstraint(['category_id'], ['financecategory.category_id'], ),
+    sa.ForeignKeyConstraint(['company_id'], ['company.company_id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_finance_id'), 'finance', ['id'], unique=False)
     op.create_table('item_category',
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
@@ -148,11 +149,11 @@ def upgrade() -> None:
     op.create_table('team',
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('team_lead_id', sa.Integer(), nullable=False),
+    sa.Column('team_lead_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('company_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['company_id'], ['company.company_id'], ),
-    sa.ForeignKeyConstraint(['team_lead_id'], ['employee.id'], ),
+    sa.ForeignKeyConstraint(['team_lead_id'], ['employee.employee_id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_team_id'), 'team', ['id'], unique=False)
@@ -191,14 +192,14 @@ def downgrade() -> None:
     op.drop_table('team')
     op.drop_index(op.f('ix_item_category_id'), table_name='item_category')
     op.drop_table('item_category')
+    op.drop_index(op.f('ix_finance_id'), table_name='finance')
+    op.drop_table('finance')
     op.drop_table('employee_increment_history')
     op.drop_table('employee_additional_roles')
     op.drop_index(op.f('ix_store_id'), table_name='store')
     op.drop_table('store')
     op.drop_index(op.f('ix_financecategory_category_id'), table_name='financecategory')
     op.drop_table('financecategory')
-    op.drop_index(op.f('ix_finance_id'), table_name='finance')
-    op.drop_table('finance')
     op.drop_index(op.f('ix_employee_id'), table_name='employee')
     op.drop_table('employee')
     op.drop_index(op.f('ix_company_company_id'), table_name='company')

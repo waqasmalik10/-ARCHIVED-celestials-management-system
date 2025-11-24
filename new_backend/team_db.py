@@ -14,13 +14,13 @@ def create_team_in_db(team, session, current_admin):
         raise HTTPException(status_code=400, detail="Enter team name")
     if team.description == 'string':
         raise HTTPException(status_code=400, detail="Enter team description")
-    if team.team_lead_id == 0:
+    if team.team_lead_id == 'string':
         raise HTTPException(status_code=400, detail="Enter team lead id")
     if team.company_id == 0 or team.company_id != company.company_id:
         raise HTTPException(status_code=400, detail="Invalid company id")
 
     # Validate team lead exists
-    team_lead = session.exec(select(Employee).where(Employee.id == team.team_lead_id,
+    team_lead = session.exec(select(Employee).where(Employee.employee_id == team.team_lead_id,
                                                     Employee.company_id == team.company_id)).first()
     if not team_lead:
         raise HTTPException(status_code=404, detail="No employee exists with this id")
@@ -56,18 +56,18 @@ def get_team_by_id_in_db(team_id, session, current_admin):
         raise HTTPException(status_code=404, detail="Company doesn't exist for admin")
     
     team = session.exec(select(Team).where(Team.id == team_id,
-                                           Team.company_id == company.company_id)).first()
+                                            Team.company_id == company.company_id)).first()
     if not team:
         raise HTTPException(status_code=404, detail='Team with given id does not exist.')
     return team
 
 # ---------------- UPDATE TEAM ----------------
-def edit_team_in_db(team, session, current_admin):
+def edit_team_in_db(team_id, team, session, current_admin):
     company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company doesn't exist for admin")
     
-    existing = session.exec(select(Team).where(Team.id == team.id,
+    existing = session.exec(select(Team).where(Team.id == team_id,
                                                 Team.company_id == company.company_id)).first()
     if not existing:
         raise HTTPException(status_code=404, detail='Team with given id does not exist.')
@@ -79,7 +79,7 @@ def edit_team_in_db(team, session, current_admin):
     
     if team.team_lead_id != 0:
         # Validate team lead in correct company
-        team_lead = session.exec(select(Employee).where(Employee.id == team.team_lead_id,
+        team_lead = session.exec(select(Employee).where(Employee.employee_id == team.team_lead_id,
                                                         Employee.company_id == existing.company_id)).first()
         if not team_lead:
             raise HTTPException(status_code=404, detail="No employee exists with this id")

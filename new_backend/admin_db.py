@@ -39,7 +39,8 @@ def register_company_in_db(company, session):
     
     # Check if a company with the same name already exists
     existing = session.exec(select(Company).where(Company.company_name == company.company_name))
-    
+    if existing:
+        raise HTTPException(status_code=404, detail="Company with given name already exists")
     # Validate and convert company input to ORM model
     company = Company.model_validate(company)
     
@@ -66,9 +67,9 @@ def create_admin_in_db(admin, session):
         raise HTTPException(status_code=400, detail="Enter password")
     
     # Check if the company exists
-    company = session.exec(select(Company).where(Company.company_name == admin.company_name))
+    company = session.exec(select(Company).where(Company.company_name == admin.company_name)).first()
     if not company:
-        raise HTTPException(status_code=404, detail='No exist with the given name')
+        raise HTTPException(status_code=404, detail='No company exist with the given name')
     
     # Check if admin already exists for that company
     existing = session.exec(

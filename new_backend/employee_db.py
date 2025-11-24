@@ -1,7 +1,5 @@
-import os
 from datetime import date
 from sqlmodel import create_engine, select
-from pydantic import field_validator
 from fastapi import HTTPException
 from models import Employee, Company, AdditionalRole, EmployeeAdditionalRoleLink
 import load_env
@@ -139,7 +137,7 @@ def display_all_employee_in_db(page, page_size, department, team, current_admin,
         raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
 
     # Base query for active employees
-    query = select(Employee).where(Employee.company_id == company.id, Employee.status == True)
+    query = select(Employee).where(Employee.company_id == company.company_id, Employee.status == True)
 
     # Apply filters dynamically
     if department:

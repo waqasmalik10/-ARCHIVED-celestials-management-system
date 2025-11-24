@@ -3,7 +3,7 @@ from sqlmodel import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta, date
 import admin_db, auth, employee_db, increment_db, finance_db, store_db, team_db
-from models import Company, CompanyBase, AdminBase, EmployeeBase, AdditionalRoleBase, EmployeeIncrementBase, FinanceBase, StoreBase, ItemCategoryBase, StoreItemsBase, TeamBase
+from models import CompanyBase, AdminBase, EmployeeBase, AdditionalRoleBase, EmployeeIncrementBase, FinanceBase, StoreBase, ItemCategoryBase, StoreItemsBase, TeamBase
 from typing import Optional
 
 # Initialize FastAPI application
@@ -64,7 +64,7 @@ def company_login(form_data: OAuth2PasswordRequestForm = Depends(), session=Depe
     return {"access_token": token, "token_type": "bearer"}
 
 # Endpoint to register a new admin
-@app.post("/register_admin", status_code=201, response_model=AdminBase)
+@app.post("/register_admin", status_code=201)
 def register_admin(admin: AdminBase, session: Session = Depends(admin_db.get_session)):
     admin_db.create_admin_in_db(admin, session)
     return 'Admin Created successfully'
@@ -96,7 +96,7 @@ def register_new_employee(employee: EmployeeBase, lst: list[AdditionalRoleBase],
 
 # Update existing employee details
 @admin_router.patch("/update_employee_details")
-def update_employee_details(employee_id: int, employee: EmployeeBase, current_admin: AdminBase = Depends(auth.get_current_user),
+def update_employee_details(employee_id: str, employee: EmployeeBase, current_admin: AdminBase = Depends(auth.get_current_user),
                     session: Session = Depends(admin_db.get_session)):
     return employee_db.update_employee_details_in_db(employee_id, employee, current_admin, session)
 
@@ -125,9 +125,9 @@ def create_increment_in_db(new_increment: EmployeeIncrementBase, session: Sessio
 
 # Retrieve increments for a specific employee
 @admin_router.get("/get_increments")
-def get_increment_by_id(employee_id: str, session: Session = Depends(admin_db.get_session),
+def get_increment_by_id(id: str, session: Session = Depends(admin_db.get_session),
                     current_admin: AdminBase = Depends(auth.get_current_user)):
-    return increment_db.get_increment_by_id_in_db(employee_id, session, current_admin)
+    return increment_db.get_increment_by_id_in_db(id, session, current_admin)
 
 # Update an existing increment record
 @admin_router.patch("/update_increment")
@@ -137,9 +137,9 @@ def update_increment(increment_id: int, new_increment: EmployeeIncrementBase, se
 
 # Delete an increment record
 @admin_router.delete("/delete_increment")
-def delete_increment(employee_id: str, session: Session = Depends(admin_db.get_session),
+def delete_increment(id: str, session: Session = Depends(admin_db.get_session),
                         current_admin: AdminBase = Depends(auth.get_current_user)):
-    return increment_db.delete_increment_in_db(employee_id, session, current_admin)
+    return increment_db.delete_increment_in_db(id, session, current_admin)
 
 # Finance endpoints router
 finance_router = APIRouter(prefix="/finance")
@@ -162,7 +162,7 @@ def delete_finance_record(cheque_no: str, session: Session = Depends(admin_db.ge
                         current_admin: AdminBase = Depends(auth.get_current_user)):
     return finance_db.delete_finance_record_in_db(cheque_no, session, current_admin)
 
-# Get all finance records with optional filtering by date range or category
+# Get all finance records with optional filtering by date range or categorytheme
 @finance_router.get("/get_finance_records")
 def get_finance_records(page: int = 1, page_size: int = 10, start_date: Optional[date] = None,
                         end_date: Optional[date] = None, category_id: Optional[int] = None,
@@ -192,7 +192,7 @@ def get_all_stores(page: int, page_size: int, session: Session = Depends(admin_d
 
 # Get store details by ID
 @store_router.get("/get_store_by_id")
-def get_store_by_id(store_id: str, session: Session = Depends(admin_db.get_session),
+def get_store_by_id(store_id: int, session: Session = Depends(admin_db.get_session),
                     current_admin: AdminBase = Depends(auth.get_current_user)):
     return store_db.get_store_by_id_in_db(store_id, session, current_admin)
 
@@ -216,7 +216,7 @@ def get_category_by_id(item_category_id:int, session: Session = Depends(admin_db
 
 # Get all categories with pagination
 @store_router.get('/get_all_categories')
-def get_all_categories(page:int, page_size:int, session: Session = Depends(admin_db.get_session),
+def get_all_categories(page:int, page_size:int, store_id:int, session: Session = Depends(admin_db.get_session),
                                     current_admin: AdminBase = Depends(auth.get_current_user)):
     return store_db.get_all_categories_in_db(page, page_size, session, current_admin)
 
@@ -240,9 +240,9 @@ def get_store_item_by_id(item_id: int, session: Session = Depends(admin_db.get_s
 
 # Get all store items with pagination
 @store_router.get("/get_store_items")
-def get_store_items_in_db(page:int, page_size:int, session: Session = Depends(admin_db.get_session),
+def get_store_items_in_db(page:int, page_size:int, category_id: int, store_id: int, session: Session = Depends(admin_db.get_session),
                             current_admin: AdminBase = Depends(auth.get_current_user)):
-    return store_db.get_store_items_in_db(page, page_size, session, current_admin)
+    return store_db.get_store_items_in_db(page, page_size, category_id, store_id, session, current_admin)
 
 # Create a new team
 @admin_router.post('/create_team')

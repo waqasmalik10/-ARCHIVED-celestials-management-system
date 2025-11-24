@@ -26,17 +26,15 @@ def create_new_store_in_db(store, session, current_admin):
     session.refresh(store)
     return store.id
 
-def update_store_details_in_db(store, session, current_admin):
+def update_store_details_in_db(store_id, store, session, current_admin):
     # Update store details with validation
     company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
-    existing = session.exec(select(Store).where(Store.unique_identifier == store.unique_identifier,
+    existing = session.exec(select(Store).where(Store.store_id == store_id,
                                                 Store.company_id == company.company_id)).first()
     if not existing:
         raise HTTPException(status_code=404, detail="Store does not exists")
-    if existing.company_id != company.company_id:
-        raise HTTPException(status_code=403, detail="Method not allowed for this store")
     if store.name != 'string':
         existing.name = store.name
     if store.unique_identifier != 'string':
@@ -72,12 +70,11 @@ def get_all_stores_in_db(page, page_size, session, current_admin):
     }
 
 def get_store_by_id_in_db(store_id, session, current_admin):
-    # Get single store by its unique identifier
     company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
-    store = session.exec(select(Store).where(Store.unique_identifier == store_id,
-                                            Store.company_id == company.company_id)).first()
+    store = session.exec(select(Store).where(Store.id == store_id,
+                                                Store.company_id == company.company_id)).first()
     if not store:
         raise HTTPException(status_code=404, detail="Store not found")
     return store
@@ -112,16 +109,18 @@ def Update_details_of_Category_for_store_items_in_db(item_category_id, item_cate
     company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
-    existing = session.exec(select(ItemCategory).where(ItemCategory.id == item_category_id)).first()
+    existing = session.exec(select(ItemCategory).where(ItemCategory.id == item_category_id,
+                                                        ItemCategory.company_id != company.company_id)).first()
     if not existing:
-        raise HTTPException(status_code=404, detail='Item Category does not exists')
-    if existing.company_id != company.company_id:
         raise HTTPException(status_code=404, detail='Item Category does not exists')
     if item_category.name != 'string':
         existing.name = item_category.name 
     if item_category.description != 'string':
         existing.description = item_category.description 
     if item_category.store_id != 'string':
+        store = session.exec(select(Store).where(Store.id == item_category.store_id)).first()
+        if store.company_id != company.company_id:
+            raise HTTPException(status_code=404, detail='Store Does not exists')
         existing.store_id = item_category.store_id
     session.commit()
     session.refresh(existing) 
@@ -138,12 +137,17 @@ def get_category_by_id_in_db(item_category_id, session, current_admin):
         raise HTTPException(status_code=409, detail='Item Category does not exists')
     return existing
 
-def get_all_categories_in_db(page, page_size, session, current_admin):
+def get_all_categories_in_db(page, page_size, store_id, session, current_admin):
     # Fetch all categories with pagination
     company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
-    all_categories = session.exec(select(ItemCategory).where(ItemCategory.company_id == company.company_id)).all()
+    query = select(ItemCategory).where(ItemCategory.company_id == company.company_id)
+    if store_id:
+        query = query.where(ItemCategory.store_id == store_id)
+
+    # Count total items for pagination
+    all_categories = session.exec(query).all()
     total = len(all_categories)
     offset = (page - 1) * page_size
     paginated_categories = all_categories[offset:offset + page_size]
@@ -176,7 +180,7 @@ def Create_store_items_in_db(item, session, current_admin):
         raise HTTPException(status_code=400, detail="Enter store id of Item")
     # Verify store and category
     store = session.exec(select(Store).where(Store.id == item.store_id,
-                                             Store.company_id == company.company_id)).first()
+                                                Store.company_id == company.company_id)).first()
     if not store:
         raise HTTPException(status_code=404, detail="Store does not exists")
     category = session.exec(select(ItemCategory).where(ItemCategory.id == item.category_id,
@@ -186,8 +190,8 @@ def Create_store_items_in_db(item, session, current_admin):
         raise HTTPException(status_code=404, detail="category does not exists in given store")
     # Check if item already exists
     existing = session.exec(select(StoreItems).where(StoreItems.name == item.name,
-                                                     StoreItems.store_id == item.store_id,
-                                                     StoreItems.category_id == item.category_id)).first()
+                                                        StoreItems.store_id == item.store_id,
+                                                        StoreItems.category_id == item.category_id)).first()
     if existing:
         raise HTTPException(status_code=409, detail='Item already exists in store')
     item = StoreItems.model_validate(item)
@@ -204,6 +208,12 @@ def Update_store_items_details_in_db(item_id, item, session, current_admin):
     existing = session.exec(select(StoreItems).where(StoreItems.id == item_id)).first()
     if not existing:
         raise HTTPException(status_code=404, detail='Item does not exist in store')
+    store = session.exec(select(Store).where(Store.company_id == company.company_id)).first()
+    if not store:
+        raise HTTPException(status_code=405, detail='Method Not Allowed for this store')
+    category = session.exec(select(ItemCategory).where(ItemCategory.company_id == company.company_id)).first()
+    if not store:
+        raise HTTPException(status_code=405, detail='Method Not Allowed for this category')
     if item.name != 'string':
         existing.name = item.name
     if item.quantity != 0:
@@ -234,21 +244,42 @@ def Update_store_items_details_in_db(item_id, item, session, current_admin):
     return existing
 
 def get_store_item_by_id_in_db(item_id, session, current_admin):
-    # Fetch a single store item by ID
     company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
     existing = session.exec(select(StoreItems).where(StoreItems.id == item_id)).first()
     if not existing:
         raise HTTPException(status_code=404, detail='Item does not exist in store')
+    category = session.exec(select(ItemCategory).where(ItemCategory.id == existing.category_id,
+                                                        ItemCategory.company_id == company.company_id)).first()
+    if not category:
+        raise HTTPException(status_code=404, detail="Category with given id does not exist")
+    store = session.exec(select(Store).where(Store.id == existing.store_id,
+                                                        Store.company_id == company.company_id)).first()
+    if not store:
+        raise HTTPException(status_code=404, detail="store with given id does not exist")
     return existing
 
-def get_store_items_in_db(page, page_size, session, current_admin):
+def get_store_items_in_db(page, page_size, category_id, store_id, session, current_admin):
     # Fetch all store items with pagination
     company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
-    all_items = session.exec(select(StoreItems)).all()
+    category = session.exec(select(ItemCategory).where(ItemCategory.id == category_id,
+                                                        ItemCategory.company_id == company.company_id)).first()
+    if not category:
+        raise HTTPException(status_code=404, detail="Category with given id does not exist")
+    store = session.exec(select(Store).where(Store.id == store_id,
+                                                        Store.company_id == company.company_id)).first()
+    if not store:
+        raise HTTPException(status_code=404, detail="store with given id does not exist")
+    query = select(StoreItems)
+    if category_id:
+        query = query.where(StoreItems.category_id == category_id)
+
+    if store_id:
+        query = query.where(StoreItems.store_id == store_id)
+    all_items = session.exec(query).all()
     total = len(all_items)
     offset = (page - 1) * page_size
     paginated_items = all_items[offset:offset + page_size]

@@ -117,6 +117,7 @@ class FinanceCategoryBase(SQLModel):
     color_code: str
 
 class FinanceCategory(FinanceCategoryBase, table=True):
+    __tablename__='financecategory'
     # Table for finance categories
     category_id: Optional[int] = Field(default=None, primary_key=True, index=True)
     company_id: Optional[int] = Field(foreign_key='company.company_id')
@@ -128,7 +129,7 @@ class FinanceBase(SQLModel):
     amount: float
     tax_deductions: float
     cheque_number: str
-    category_id: int
+    category_id: int = Field(foreign_key='financecategory.category_id')
 
 class Finance(FinanceBase, table=True):
     # Table for finance records
@@ -174,7 +175,7 @@ class StoreItems(StoreItemsBase, table=True):
 class TeamBase(SQLModel):
     name: str = Field(..., min_length=1)
     description: str = Field(..., min_length=1)
-    team_lead_id: int = Field(foreign_key='employee.id')
+    team_lead_id: str = Field(foreign_key='employee.employee_id')
     company_id: int = Field(foreign_key='company.company_id')
 
 class Team(TeamBase, table=True):

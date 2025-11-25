@@ -77,15 +77,16 @@ def update_increment_in_db(increment_id, new_increment, session, current_admin):
         raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
     
     # Retrieve existing increment
-    increment = session.exec(select(EmployeeIncrement).where(
-        EmployeeIncrement.id == increment_id,
-        EmployeeIncrement.company_id == company.company_id
-    )).first()
+    increment = session.exec(select(EmployeeIncrement).where(EmployeeIncrement.id == increment_id,
+                                                            EmployeeIncrement.company_id == company.company_id)).first()
     if not increment:
         raise HTTPException(status_code=404, detail="Increment does not exist")
     
     # Get employee record
-    employee =  session.exec(select(Employee).where(Employee.employee_id == new_increment.employee_id)).first()
+    employee =  session.exec(select(Employee).where(Employee.employee_id == new_increment.employee_id,
+                                                    Employee.company_id == company.company_id)).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail=f"Employee with id: {new_increment.employee_id} does not exists")
     if new_increment.employee_id != 'string':
         increment.employee_id  = new_increment.employee_id
         

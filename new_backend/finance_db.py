@@ -41,15 +41,19 @@ def create_finance_in_db(finance, session, current_admin):
 
 
 # --- Edit an existing finance record ---
-def edit_finance_record_in_db(finance_id, finance, session, currentadmin):
+def edit_finance_record_in_db(finance_id, finance, session, current_admin):
+    company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
     # Retrieve existing finance record
-    existing = session.exec(select(Finance).where(Finance.id == finance_id)).first()
+    existing = session.exec(select(Finance).where(Finance.id == finance_id,
+                                                    Finance.company_id == company.company_id)).first()
     if not existing:
         raise HTTPException(status_code=404, detail="Finance Record does not exists")
 
     # Update fields if valid
     if finance.tax_deductions != 0:
-        existing.tax_deductions= finance.tax_deductions
+        existing.tax_deductions = finance.tax_deductions
     if finance.description != 'string':
         existing.description = finance.description
     if finance.amount != 0:
@@ -65,9 +69,13 @@ def edit_finance_record_in_db(finance_id, finance, session, currentadmin):
 
 
 # --- Delete a finance record ---
-def delete_finance_record_in_db(finance_id, session, currentadmin):
-    # Retrieve finance record
-    existing = session.exec(select(Finance).where(Finance.id == finance_id)).first()
+def delete_finance_record_in_db(finance_id, session, current_admin):
+    company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
+    # Retrieve existing finance record
+    existing = session.exec(select(Finance).where(Finance.id == finance_id,
+                                                    Finance.company_id == company.company_id)).first()
     if not existing:
         raise HTTPException(status_code=404, detail="Finance Record does not exists")
 
@@ -103,9 +111,6 @@ def get_finance_records_in_db(page, page_size, start_date, end_date, category_id
     # Pagination calculation
     offset = (page - 1) * page_size
     paginated_records = all_records[offset:offset + page_size]
-
-    if not paginated_records:
-        raise HTTPException(status_code=404, detail="No finance records found for this query")
 
     # --- Summary calculations ---
     total_earnings = sum(f.amount for f in all_records)

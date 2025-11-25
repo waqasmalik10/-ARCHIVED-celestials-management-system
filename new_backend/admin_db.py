@@ -38,9 +38,9 @@ def register_company_in_db(company, session):
         raise HTTPException(status_code=400, detail="Enter email")
     
     # Check if a company with the same name already exists
-    existing = session.exec(select(Company).where(Company.company_name == company.company_name))
+    existing = session.exec(select(Company).where(Company.company_name == company.company_name)).first()
     if existing:
-        raise HTTPException(status_code=404, detail="Company with given name already exists")
+        raise HTTPException(status_code=409, detail="Company with given name already exists")
     # Validate and convert company input to ORM model
     company = Company.model_validate(company)
     
@@ -93,14 +93,11 @@ def create_admin_in_db(admin, session):
 def update_company_profile_in_db(company_id, company, session, current_admin):
     # Fetch the existing company by ID
     existing = session.exec(
-        select(Company).where(Company.company_id == company_id)).first()
+        select(Company).where(Company.company_id == company_id,
+                                Company.company_name == current_admin.company_name)).first()
     
     if not existing:
         raise HTTPException(status_code=404, detail="Company Does not exists")
-    
-    # Ensure the current admin is authorized to update this company
-    if existing.company_name != current_admin.company_name:
-        raise HTTPException(status_code=403, detail="Method not allowed for this Company")
     
     # Update fields if new values are provided
     if company.company_name != 'string':
@@ -128,4 +125,4 @@ def update_password_in_db(old, new, current_admin, session):
         return "Password Update"
     else:
         # Raise error if old password is incorrect
-        raise HTTPException(status_code=403, detail="Provided password is wrong")
+        raise HTTPException(status_code=401, detail="Provided password is wrong")

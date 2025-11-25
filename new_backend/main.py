@@ -77,8 +77,7 @@ def get_company_profile(admin: AdminBase = Depends(auth.get_current_user)):
 
 # Update company profile information
 @admin_router.patch("/update_company_profile")
-def update_company_profile(company_id: int, company: CompanyBase,
-                            current_admin: AdminBase = Depends(auth.get_current_user),
+def update_company_profile(company_id: int, company: CompanyBase, current_admin: AdminBase = Depends(auth.get_current_user),
                             session: Session = Depends(admin_db.get_session)):
     return admin_db.update_company_profile_in_db(company_id, company, session, current_admin)
 
@@ -90,29 +89,32 @@ def update_password(old:str, new: str, current_admin: AdminBase = Depends(auth.g
 
 # Register a new employee with optional additional roles
 @admin_router.post("/create_employee")
-def register_new_employee(employee: EmployeeBase, lst: list[AdditionalRoleBase], current_admin: AdminBase = Depends(auth.get_current_user),
-                    session: Session = Depends(admin_db.get_session)):
+def register_new_employee(employee: EmployeeBase, lst: list[AdditionalRoleBase],
+                            current_admin: AdminBase = Depends(auth.get_current_user),
+                            session: Session = Depends(admin_db.get_session)):
     return employee_db.register_new_employee_in_db(employee, lst, current_admin, session)
 
 # Update existing employee details
 @admin_router.patch("/update_employee_details")
 def update_employee_details(employee_id: str, employee: EmployeeBase, current_admin: AdminBase = Depends(auth.get_current_user),
-                    session: Session = Depends(admin_db.get_session)):
+                            session: Session = Depends(admin_db.get_session)):
     return employee_db.update_employee_details_in_db(employee_id, employee, current_admin, session)
 
 # Deactivate an employee account
 @admin_router.patch("/deactivate_employee")
-def deactivate_employee(employee_id: str, current_admin: AdminBase = Depends(auth.get_current_user), session: Session = Depends(admin_db.get_session)):
+def deactivate_employee(employee_id: str, current_admin: AdminBase = Depends(auth.get_current_user),
+                        session: Session = Depends(admin_db.get_session)):
     return employee_db.deactivate_employee_in_db(employee_id, current_admin, session)
 
 # Display all employees with pagination and optional filtering by department or team
 @admin_router.get("/display_all_employees")
 def display_all_employee(page: int = 1, page_size: int = 10, department: Optional[str] = None, team: Optional[str] = None,
-                            current_admin: AdminBase = Depends(auth.get_current_user), session: Session = Depends(admin_db.get_session)):
+                            current_admin: AdminBase = Depends(auth.get_current_user),
+                            session: Session = Depends(admin_db.get_session)):
     return employee_db.display_all_employee_in_db(page, page_size, department, team, current_admin, session)
 
 # Update roles for an employee
-@admin_router.put("/Update Roles")
+@admin_router.put("/update_roles")
 def update_roles(employee_id: str, lst: list[AdditionalRoleBase], current_admin: AdminBase = Depends(auth.get_current_user),
                     session: Session = Depends(admin_db.get_session)):
     return employee_db.update_roles_in_db(employee_id, lst, current_admin, session)
@@ -143,7 +145,6 @@ def delete_increment(id: str, session: Session = Depends(admin_db.get_session),
 
 # Finance endpoints router
 finance_router = APIRouter(prefix="/finance")
-
 # Create a new finance record
 @finance_router.post("/create_finance_record")
 def create_finance(finance: FinanceBase, session: Session = Depends(admin_db.get_session),
@@ -152,15 +153,15 @@ def create_finance(finance: FinanceBase, session: Session = Depends(admin_db.get
 
 # Edit an existing finance record
 @finance_router.patch("/edit_finance_record")
-def edit_finance_record(finance: FinanceBase, session: Session = Depends(admin_db.get_session),
+def edit_finance_record(finance_id: int,finance: FinanceBase, session: Session = Depends(admin_db.get_session),
                         current_admin: AdminBase = Depends(auth.get_current_user)):
-    return finance_db.edit_finance_record_in_db(finance, session, current_admin)
+    return finance_db.edit_finance_record_in_db(finance_id, finance, session, current_admin)
 
 # Delete a finance record
 @finance_router.delete("/delete_finance_record")
-def delete_finance_record(cheque_no: str, session: Session = Depends(admin_db.get_session),
+def delete_finance_record(finance_id: int, session: Session = Depends(admin_db.get_session),
                         current_admin: AdminBase = Depends(auth.get_current_user)):
-    return finance_db.delete_finance_record_in_db(cheque_no, session, current_admin)
+    return finance_db.delete_finance_record_in_db(finance_id, session, current_admin)
 
 # Get all finance records with optional filtering by date range or categorytheme
 @finance_router.get("/get_finance_records")
@@ -180,9 +181,9 @@ def create_new_store(store: StoreBase, session: Session = Depends(admin_db.get_s
 
 # Update store details
 @store_router.patch("/update_store")
-def update_store_details(store: StoreBase, session: Session = Depends(admin_db.get_session),
+def update_store_details(store_id: int, store: StoreBase, session: Session = Depends(admin_db.get_session),
                     current_admin: AdminBase = Depends(auth.get_current_user)):
-    return store_db.update_store_details_in_db(store, session, current_admin)
+    return store_db.update_store_details_in_db(store_id, store, session, current_admin)
 
 # Get all stores with pagination
 @store_router.get("/get_all_stores")
@@ -209,16 +210,16 @@ def Update_details_of_Category_for_store_items(item_category_id: int, item_categ
     return store_db.Update_details_of_Category_for_store_items_in_db(item_category_id, item_category, session, current_admin)
 
 # Get category by ID
-@store_router.get('/get_category_by_id/{category_id}')
+@store_router.get('/get_category_by_id')
 def get_category_by_id(item_category_id:int, session: Session = Depends(admin_db.get_session),
                                     current_admin: AdminBase = Depends(auth.get_current_user)):
     return store_db.get_category_by_id_in_db(item_category_id, session, current_admin)
 
 # Get all categories with pagination
 @store_router.get('/get_all_categories')
-def get_all_categories(page:int, page_size:int, store_id:int, session: Session = Depends(admin_db.get_session),
+def get_all_categories(page:int, page_size:int, store_id: int, session: Session = Depends(admin_db.get_session),
                                     current_admin: AdminBase = Depends(auth.get_current_user)):
-    return store_db.get_all_categories_in_db(page, page_size, session, current_admin)
+    return store_db.get_all_categories_in_db(page, page_size, store_id, session, current_admin)
 
 # Create store items
 @store_router.post('/Create_store_items')
@@ -233,7 +234,7 @@ def Update_store_items_details(item_id: int, item: StoreItemsBase, session: Sess
     return store_db.Update_store_items_details_in_db(item_id, item, session, current_admin)
 
 # Get store item by ID
-@store_router.get("/get_store_item_by_id/{category_id}")
+@store_router.get("/get_store_item_by_id")
 def get_store_item_by_id(item_id: int, session: Session = Depends(admin_db.get_session),
                         current_admin: AdminBase = Depends(auth.get_current_user)):
     return store_db.get_store_item_by_id_in_db(item_id, session, current_admin)

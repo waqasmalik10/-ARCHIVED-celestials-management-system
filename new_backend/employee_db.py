@@ -89,7 +89,7 @@ def update_employee_details_in_db(employee_id, employee, current_admin, session)
     if not employee_to_update:
         raise HTTPException(status_code=404, detail="Employee does not exist")
     if not employee_to_update.status:
-        raise HTTPException(status_code=404, detail="Employee is deactivated")
+        raise HTTPException(status_code=403, detail="Employee is deactivated")
 
     # Update employee fields dynamically
     employee_data = employee.dict(exclude_unset=True, exclude_defaults=True)
@@ -120,7 +120,7 @@ def deactivate_employee_in_db(employee_id, current_admin, session):
     if not employee_to_update:
         raise HTTPException(status_code=404, detail="Employee does not exist")
     if not employee_to_update.status:
-        raise HTTPException(status_code=404, detail="Employee is already deactivated")
+        raise HTTPException(status_code=409, detail="Employee is already deactivated")
 
     # Deactivate employee
     employee_to_update.status = False
@@ -150,10 +150,6 @@ def display_all_employee_in_db(page, page_size, department, team, current_admin,
     total_count = len(total_employees)
     offset = (page - 1) * page_size
     paginated_employees = total_employees[offset:offset + page_size]
-
-    if not paginated_employees:
-        raise HTTPException(status_code=404, detail="No employees found for this query")
-
     return {
         "page": page,
         "page_size": page_size,
@@ -186,7 +182,7 @@ def update_roles_in_db(employee_id, lst, current_admin, session):
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
     if not employee.status:
-        raise HTTPException(status_code=404, detail="Employee is deactivated")
+        raise HTTPException(status_code=403, detail="Employee is deactivated")
 
     # --- Remove existing role links and roles ---
     existing_links = session.exec(

@@ -134,7 +134,7 @@ def get_category_by_id_in_db(item_category_id, session, current_admin):
     existing = session.exec(select(ItemCategory).where(ItemCategory.id == item_category_id,
                                                         ItemCategory.company_id == company.company_id)).first()
     if not existing:
-        raise HTTPException(status_code=409, detail='Item Category does not exists')
+        raise HTTPException(status_code=404, detail='Item Category does not exists')
     return existing
 
 def get_all_categories_in_db(page, page_size, store_id, session, current_admin):
@@ -208,12 +208,14 @@ def Update_store_items_details_in_db(item_id, item, session, current_admin):
     existing = session.exec(select(StoreItems).where(StoreItems.id == item_id)).first()
     if not existing:
         raise HTTPException(status_code=404, detail='Item does not exist in store')
-    store = session.exec(select(Store).where(Store.company_id == company.company_id)).first()
+    store = session.exec(select(Store).where(Store.id == existing.store_id,
+                                                Store.company_id == company.company_id)).first()
     if not store:
-        raise HTTPException(status_code=405, detail='Method Not Allowed for this store')
-    category = session.exec(select(ItemCategory).where(ItemCategory.company_id == company.company_id)).first()
-    if not store:
-        raise HTTPException(status_code=405, detail='Method Not Allowed for this category')
+        raise HTTPException(status_code=403, detail='Method Not Allowed for this store Items')
+    category = session.exec(select(ItemCategory).where(ItemCategory.id == existing.category_id,
+                                                        ItemCategory.company_id == company.company_id)).first()
+    if not category:
+        raise HTTPException(status_code=403, detail='Method Not Allowed for this category Items')
     if item.name != 'string':
         existing.name = item.name
     if item.quantity != 0:
@@ -239,6 +241,13 @@ def Update_store_items_details_in_db(item_id, item, session, current_admin):
             if not category:
                 raise HTTPException(status_code=404, detail="category does not exists in given store")
         existing.store_id = item.store_id
+    if item.category_id != 0:
+        category = session.exec(select(ItemCategory).where(ItemCategory.id == item.category_id,
+                                                            ItemCategory.store_id == existing.store_id,
+                                                            ItemCategory.company_id == company.company_id)).first()
+        if not category:
+            raise HTTPException(status_code=404, detail="category does not exists in given store1")
+        existing.category_id = item.category_id
     session.commit()
     session.refresh(existing)
     return existing
@@ -255,7 +264,7 @@ def get_store_item_by_id_in_db(item_id, session, current_admin):
     if not category:
         raise HTTPException(status_code=404, detail="Category with given id does not exist")
     store = session.exec(select(Store).where(Store.id == existing.store_id,
-                                                        Store.company_id == company.company_id)).first()
+                                                Store.company_id == company.company_id)).first()
     if not store:
         raise HTTPException(status_code=404, detail="store with given id does not exist")
     return existing

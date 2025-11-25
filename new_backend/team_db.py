@@ -16,9 +16,10 @@ def create_team_in_db(team, session, current_admin):
         raise HTTPException(status_code=400, detail="Enter team description")
     if team.team_lead_id == 'string':
         raise HTTPException(status_code=400, detail="Enter team lead id")
-    if team.company_id == 0 or team.company_id != company.company_id:
-        raise HTTPException(status_code=400, detail="Invalid company id")
-
+    if team.company_id == 0:
+        raise HTTPException(status_code=400, detail="Enter company id")
+    if team.company_id != company.company_id:
+        raise HTTPException(status_code=403, detail="Invalid company id")
     # Validate team lead exists
     team_lead = session.exec(select(Employee).where(Employee.employee_id == team.team_lead_id,
                                                     Employee.company_id == team.company_id)).first()
@@ -83,6 +84,10 @@ def edit_team_in_db(team_id, team, session, current_admin):
                                                         Employee.company_id == existing.company_id)).first()
         if not team_lead:
             raise HTTPException(status_code=404, detail="No employee exists with this id")
+        team_lead = session.exec(select(Team).where(Team.team_lead_id == team.team_lead_id,
+                                                    Team.company_id == team.company_id)).first()
+        if team_lead:
+            raise HTTPException(status_code=409, detail="Team lead is already leading a team")
         existing.team_lead_id = team.team_lead_id
     
     session.commit()

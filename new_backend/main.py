@@ -9,12 +9,9 @@ from typing import Optional
 # Initialize FastAPI application
 app = FastAPI(title="Celestials Management System")
 
-# Dictionary to store access tokens associated with client IPs
-current_tokens = {}
-
 # Middleware to automatically attach token for authenticated requests
 @app.middleware("http")
-async def auto_auth_middleware(request: Request, call_next):
+async def auto_auth_middleware(request: Request, call_next, session: Session = Depends(admin_db.get_session)):
     client_ip = request.client.host  # Get client IP address
 
     # Skip token injection for admin login endpoint
@@ -27,11 +24,12 @@ async def auto_auth_middleware(request: Request, call_next):
         return response
 
     # Attach token to request headers if token exists for this client IP
-    token = current_tokens.get(client_ip)
-    if token:
-        request.headers.__dict__["_list"].append(
-            (b"authorization", f"Bearer {token}".encode())
-        )
+    with Session(admin_db.engine) as session:
+        token_record = admin_db.get_client_token_in_db(client_ip, session)
+        if token_record:
+            request.headers.__dict__["_list"].append(
+                (b"authorization", f"Bearer {token_record}".encode())
+            )
 
     response = await call_next(request)
     return response
@@ -59,7 +57,7 @@ def company_login(form_data: OAuth2PasswordRequestForm = Depends(), session=Depe
 
     # Store token for the client IP
     client_ip = request.client.host
-    current_tokens[client_ip] = token
+    admin_db.add_jwt_token_in_db(client_ip, token, session)
 
     return {"access_token": token, "token_type": "bearer"}
 

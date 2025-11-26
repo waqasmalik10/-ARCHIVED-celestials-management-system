@@ -1,11 +1,14 @@
 from sqlmodel import create_engine, Session, select
 from fastapi import HTTPException
-from models import Admin, Company
+from models import Admin, Company, jwt_tokens
+from jose import jwt, JWTError, ExpiredSignatureError
 
 import load_env
 
 # Load the database URL from environment variables or config
 DATABASE_URL = load_env.get_database_url()
+SECRET_KEY = load_env.get_secret_key()
+ALGORITHM = load_env.get_algorithm()
 
 # Create SQLModel engine with echo=True to log SQL statements
 engine = create_engine(DATABASE_URL, echo=True)
@@ -126,3 +129,34 @@ def update_password_in_db(old, new, current_admin, session):
     else:
         # Raise error if old password is incorrect
         raise HTTPException(status_code=401, detail="Provided password is wrong")
+
+
+def add_jwt_token_in_db(client_ip: str, token: str, session: Session):
+    # Create new JWT token record
+    jwt_record = session.exec(select(jwt_tokens).where(jwt_tokens.client_ip == client_ip)).first()
+    if jwt_record:
+        jwt_record.token = token
+    else:
+        jwt_record = jwt_tokens(client_ip=client_ip, token=token)
+        session.add(jwt_record)
+    session.commit()
+    session.refresh(jwt_record)  # Refresh to get generated ID
+    return jwt_record
+
+def get_client_token_in_db(client_ip: str, session: Session):
+    jwt_record = session.exec(select(jwt_tokens).where(jwt_tokens.client_ip == client_ip)).first()
+    if jwt_record:
+        token = jwt_record.token
+
+        # Check if token is expired
+        try:
+            jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            # if no exception → token is valid
+            return token
+
+        except ExpiredSignatureError:
+            return "Token Expired. Login Again."
+
+        except JWTError:
+            return "Invalid Token"
+    return "Register yourself First"

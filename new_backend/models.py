@@ -188,3 +188,11 @@ class Teams_to_employee(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
     team_id: int = Field(foreign_key='team.id')
     team_lead_id: int = Field(foreign_key='employee.id')
+
+class jwt_tokens(SQLModel, table=True):
+    # Table for storing JWT tokens
+    __tablename__ = "jwt_tokens"
+    id: Optional[int] = Field(default=None, primary_key=True, index=True)
+    client_ip: str = Field(..., min_length=1)
+    token: str = Field(..., min_length=1)
+    created_at: Optional[date] = Field(default=date.today())

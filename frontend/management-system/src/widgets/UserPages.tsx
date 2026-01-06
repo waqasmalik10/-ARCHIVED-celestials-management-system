@@ -14,7 +14,16 @@ import UpdateCategoryPage from "../pages/UpdateCategoryPage";
 import InventoryBodyPage from "../pages/InventoryBodyPage";
 import StorePage from "../pages/StorePage";
 import NewStorePage from "../pages/NewStorePage";
-import InventoryCategoriesPage from "pages/InventoryCategoriesPage";
+import InventoryCategoriesPage from "../pages/InventoryCategoriesPage";
+import UpdateStorePage from "../pages/UpdateStorePage";
+import NewInventoryCategoryPage from "../pages/NewInventoryCategoryPage";
+import UpdateInventoryCategoryPage from "../pages/UpdateInventoryCategoryPage";
+import InventoryItemsPage from "../pages/InventoryItemsPage";
+import NewInventoryItemsPage from "../pages/NewInventoryItemsPage";
+import UpdateInventoryItemPage from "../pages/UpdateInventoryItemPage";
+import TeamPage from "../pages/TeamPage";
+import NewTeamPage from "../pages/NewTeamPage";
+import UpdateTeamsPage from "../pages/UpdateTeamsPage";
 
 interface UserPageProps {
   name: string;
@@ -45,7 +54,16 @@ export default function UserPage({ superAdmin }: UserPageProps) {
         <Route path="/inventory" element={<InventoryBodyPage />} />
         <Route path="/inventory/stores" element={<StorePage />} />
         <Route path="/inventory/new-store" element={<NewStorePage />} />
-        <Route path="/inventory/categories" element={<InventoryCategoriesPage/>} />
+        <Route path="/inventory/update-store/:storeId" element={<UpdateStorePage />} />
+        <Route path="/inventory/categories" element={<InventoryCategoriesPage />} />
+        <Route path="/inventory/new-category" element={<NewInventoryCategoryPage />} />
+        <Route path="/inventory/update-category/:categoryId" element={<UpdateInventoryCategoryPage />} />
+        <Route path="/inventory/items" element={<InventoryItemsPage />} />
+        <Route path="/inventory/new-items" element={<NewInventoryItemsPage />} />
+        <Route path="/inventory/update-items/:itemId" element={<UpdateInventoryItemPage />} />
+        <Route path="/teams" element={<TeamPage />} />
+        <Route path="/teams/new-team" element={<NewTeamPage />} />
+        <Route path="/teams/update-team/:teamId" element={<UpdateTeamsPage />} />
         <Route path="/settings" element={<Setting />} />
       </Routes>
 

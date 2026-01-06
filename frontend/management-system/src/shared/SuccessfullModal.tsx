@@ -48,7 +48,7 @@ const SuccessfullModal = React.forwardRef<HTMLDivElement, SuccessfullModalProps>
       >
         <div
           ref={ref}
-          className={`relative min-w-[500px] rounded-[15px] overflow-hidden transition-opacity duration-500 ${
+          className={`relative min-w-[300px] w-full max-w-[500px] rounded-[15px] overflow-hidden transition-opacity duration-500 ${
             showBorder ? 'opacity-100' : 'opacity-0'
           }`}
         >

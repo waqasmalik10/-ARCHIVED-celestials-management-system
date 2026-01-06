@@ -7,7 +7,8 @@ import liquidityIcon from "../assets/images/liquidity.svg";
 import companyPolicy from "../assets/images/companyPolicyIcon.svg";
 import financeIcon from "../assets/images/finanaceIcon.svg"
 import registerIcon from "../assets/images/register.svg"
-import settingsIcon from "../assets/images/settingsIcon.svg";
+import settingsIcon from "../assets/images/settingsLogo.svg";
+// import settingsIcon from "../assets/images/settingsIcon.svg";
 import settingIcon from "../assets/images/settingIcon.svg";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -107,12 +108,13 @@ export default function SideBar(props: SideBarProps) {
       // setLeaves(false);
       // setLoan(false);
     } else if (
-      location.pathname === "/departments" ||
-      location.pathname.startsWith("/departments")
+      location.pathname === "/teams" ||
+      location.pathname.startsWith("/teams")
     ) {
       setActiveDashboard(false);
       setActiveSettings(false);
       setActiveEmployees(false);
+      setActiveFinance(false)
       setActiveDepartments(true);
       setActivePolicy(false);
       setActiveInventory(false)
@@ -177,11 +179,7 @@ export default function SideBar(props: SideBarProps) {
     navigate("/inventory")
   };
   const navigateDepartments = () => {
-    navigate("/departments");
-  };
-
-  const navigatePolicy = () => {
-    navigate("/policy");
+    navigate("/teams");
   };
 
 
@@ -223,26 +221,20 @@ export default function SideBar(props: SideBarProps) {
       show: props.superAdmin,
     },
     {
-      label: "Departments",
+      label: "Teams",
       icon: departmentsIcon,
       onClick: navigateDepartments,
       active: activeDepartments,
       show: props.superAdmin,
     },
     {
-      label: "Liquidity",
-      icon: liquidityIcon,
-      onClick: () => { },
-      active: false,
-      show: true,
-    },
-    {
-      label: "Company Policies",
-      icon: companyPolicy,
-      onClick: navigatePolicy,
-      active: activePolicy,
-      show: true,
-    },
+      label: "Settings",
+      icon: settingsIcon,
+      onClick: navigateSetting,
+      active: activeSettings,
+      show: true, 
+    }
+
   ];
 
   return (

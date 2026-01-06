@@ -27,9 +27,9 @@ const taxRate = 5;
 const Form = () => {
 
     const { addFinance, clearError, idExistError, successfullModal, setSuccessfullModal, setEditingFinance, editingFinance, updateFinance, financeCategoriesList, financeList } = useFinance();
-    const labelStyles = "font-urbanist font-semibold text-[21px] leading-[180%] text-white"
+    const labelStyles = "font-urbanist font-semibold text-base md:text-lg lg:text-[21px] lg:leading-[180%] text-white"
     const inputBorder = "inputMainBorder mt-3.5 w-full rounded-[8px]"
-    const inputStyles = "inputBox py-[21px] px-[29px] rounded-[15px] text-white placeholder-[#747681]"
+    const inputStyles = "inputBox text-sm md:text-base leading-normal px-4 py-2.5 lg:py-[21px] lg:px-[29px] rounded-[15px] text-white placeholder-[#747681]"
     const errorClasses = "text-red-500 text-xs mt-1 absolute -bottom-6"
     const navigate = useNavigate()
 
@@ -126,7 +126,7 @@ const Form = () => {
     return (
         <>
             <form onSubmit={formik.handleSubmit} noValidate>
-                <div className="grid md:grid-cols-2 gap-[38px]">
+                <div className="grid md:grid-cols-2 gap-3 md:gap-5 lg:gap-[38px]">
                     <div className="relative">
                         <FormInput label="Id"
                             type="text"
@@ -184,7 +184,7 @@ const Form = () => {
                     </div>
                     <div className="relative">
                         <label className={`${labelStyles}`}>Select Category</label>
-                        <div className={`${inputBorder} h-[66px]`}>
+                        <div className={`${inputBorder} h-fit`}>
                             <Select
                                 onClick={selectCategory}
                                 children={selectedCategory}
@@ -249,7 +249,7 @@ const Form = () => {
                         {idExistError}
                     </p>
                 )}
-                <Button type="submit" disabled={editingFinance ? !formik.dirty : false} buttonClasses={`min-h-[64px] border border-[#CDD6D7] border-solid bg-[#283573] py-5 px-[75px] rounded-[15px] mt-[58px] text-2xl font-semibold leading-[160%] font-urbanist text-white w-fit ${editingFinance && !formik.dirty ? 'opacity-50 !cursor-not-allowed' : 'opacity-1 !cursor-pointer'}`}>
+                <Button type="submit" disabled={editingFinance ? !formik.dirty : false} buttonClasses={`min-h-10 lg:min-h-[64px] border border-[#CDD6D7] border-solid bg-[#283573] py-3 px-2 lg:py-5 lg:px-[75px] rounded-[15px] flex mx-auto lg:mx-0 mt-4 md:mt-[58px] text-base md:text-lg lg:text-2xl font-semibold lg:leading-[160%] font-urbanist text-white min-w-[200px] lg:min-w-auto w-fit ${editingFinance && !formik.dirty ? 'opacity-50 !cursor-not-allowed' : 'opacity-1 !cursor-pointer'}`}>
                     {editingFinance ? 'Update' : 'Register'}
                 </Button>
             </form>

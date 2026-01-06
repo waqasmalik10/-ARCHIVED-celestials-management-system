@@ -50,7 +50,7 @@ export default function Button({
   }
 
   return (
-    <ShadcnButton className={`${className ?? ""} min-h-[42px] ${buttonClasses ?? ""}`} {...props}>
+    <ShadcnButton className={`${className ?? ""} w-fit min-h-[42px] ${buttonClasses ?? ""}`} {...props}>
       {children}
     </ShadcnButton>
   )

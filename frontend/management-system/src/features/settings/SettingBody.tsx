@@ -2,20 +2,24 @@ import { useContext, useRef, useState } from "react";
 import profileIcon from "../../assets/images/profileIcon.svg";
 import { ThemeContext } from "../../app/ThemeContext";
 import Button from "../../shared/Button";
+import SettingsModal from "./SettingsModal";
 
 interface SettingBodyProps {
   superAdmin?: boolean;
   name?: string;
   email?: string;
+  password?: number;
 }
 
 export default function SettingBody({
   name,
   email,
+  password,
 }: SettingBodyProps) {
   const context = useContext(ThemeContext);
   const { theme, toggleTheme } = context;
   const [file, setFile] = useState<string | null>(null);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleClick = () => {
@@ -31,22 +35,35 @@ export default function SettingBody({
     }
   };
 
+  const settingsHead = "w-full p-5 lg:p-7 bg-[#1E2C6D] dark:bg-[#383838] text-xl md:text-2xl lg:text-3xl"
+
+  const handleChangePassword = () => {
+    setShowSettingsModal(true);
+    window.scrollTo(0, 0);
+    document.body.style.overflow = "hidden";
+  };
+  const handleCloseSettingsModal = () => {
+    setShowSettingsModal(false);
+    window.scrollTo(0, 0);
+    document.body.style.overflow = "auto";
+  };
+
   return (
     <>
       <div className="flex flex-col gap-3 text-white">
-        <p className="w-full p-7 bg-[#1E2C6D] dark:bg-[#383838]  text-3xl">Profile Image:</p>
+        <p className={settingsHead}>Profile Image:</p>
         <div className="flex gap-10 flex-wrap items-center">
           {file ? (
             <img
               src={file}
               alt="Uploaded preview"
-              className="mt-2 w-40 h-40 object-cover rounded-full"
+              className="mt-2 w-20 h-20 lg:w-40 lg:h-40 object-cover rounded-full"
             />
           ) : (
             <img
               src={profileIcon}
               alt="profile"
-              className="mt-2 w-40 h-40 object-cover rounded-full"
+              className="mt-2 w-20 h-20 lg:w-40 lg:h-40 object-cover rounded-full"
             />
           )}
 
@@ -59,25 +76,34 @@ export default function SettingBody({
           />
           <div className="flex flex-wrap gap-2">
             <Button
-              buttonClasses="buttonColor px-5 py-4 pb-5 rounded-[10px] text-white text-xl font-inter font-medium leading-[17px] text-center"
+              buttonClasses="buttonColor px-5 py-4 pb-5 rounded-[10px] text-white text-base md:text-lg lg:text-xl font-inter font-medium lg:leading-[17px] text-center"
               onClick={handleClick}
             >
               Change Image
             </Button>
-            <Button buttonClasses="buttonColor px-5 py-4 pb-5 rounded-[10px] text-white text-xl font-inter font-medium leading-[17px] text-center">
+            <Button buttonClasses="buttonColor px-5 py-4 pb-5 rounded-[10px] text-white text-base md:text-lg lg:text-xl font-inter font-medium lg:leading-[17px] text-center">
               Save
             </Button>
           </div>
         </div>
       </div>
-      <div className="flex lg:flex-row flex-col gap-5 lg:gap-3 mt-6">
-        <div className="w-full lg:w-1/2 flex flex-col gap-3 text-white">
-          <p className="w-full p-7 bg-[#1E2C6D] dark:bg-[#383838]  text-3xl">Your Name:</p>
-          <h1 className="text-2xl mt-4 px-7 capitalize">{name}</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-3 mt-6">
+        <div className="w-full flex flex-col gap-3 text-white">
+          <p className={settingsHead}>Your Name:</p>
+          <h1 className="text-xl md:text-2xl lg:text-3xl mt-4 px-7 capitalize">{name}</h1>
         </div>
-        <div className="w-full lg:w-1/2 flex flex-col gap-3 text-white">
-          <p className="w-full p-7 bg-[#1E2C6D] dark:bg-[#383838]  text-3xl">Your Email:</p>
-          <h1 className="text-2xl mt-4 px-7">{email}</h1>
+        <div className="w-full flex flex-col gap-3 text-white">
+          <p className={settingsHead}>Your Email:</p>
+          <h1 className="text-xl md:text-2xl lg:text-3xl mt-4 px-7">{email}</h1>
+        </div>
+        <div className="w-full flex flex-col gap-3 text-white">
+          <p className={settingsHead}>Your Password:</p>
+          <div className="flex flex-wrap gap-5 justify-between mt-4 items-center">
+            <h1 className="text-xl md:text-2xl lg:text-3xl px-7">********</h1>
+            <Button onClick={handleChangePassword} buttonClasses="buttonColor px-5 py-4 pb-5 rounded-[10px] text-white text-base md:text-lg lg:text-xl font-inter font-medium lg:leading-[17px] text-center">
+              Change Password
+            </Button>
+          </div>
         </div>
       </div>
       <div className="mt-10">
@@ -88,6 +114,7 @@ export default function SettingBody({
           {theme === "light" ? "Switch to Dark" : "Switch to Light"}
         </Button>
       </div>
+      {showSettingsModal && <SettingsModal closeModal={handleCloseSettingsModal} previousPassword={password?.toString() || ""} />}
     </>
   );
 }

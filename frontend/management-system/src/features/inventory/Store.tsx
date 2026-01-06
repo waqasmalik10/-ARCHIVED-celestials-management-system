@@ -16,14 +16,14 @@ const Store = () => {
 
     return (
         <>
-            <ImageButton type="button" onClick={backPgae} className="mt-5">
+            <ImageButton type="button" onClick={backPgae} buttonClasses="mt-5 w-5 h-5 md:w-7 md:h-7">
                 <img src={backImg} alt="back Image" />
             </ImageButton>
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-                <h2 className="mt-5 md:mt-[46px] text-[58px] font-semibold font-poppins leading-[140%] text-white">
+            <div className="mt-5 md:mt-[46px] flex items-center justify-between gap-4 flex-wrap">
+                <h2 className="text-2xl md:text-3xl lg:text-[58px] font-semibold font-poppins lg:leading-[140%] text-white">
                     Store
                 </h2>
-                <Button type="button" buttonClasses="bodyBackground w-fit fade-bottom rounded-[15px] p-2.5 md:py-[26px] md:px-2 lg:px-8 flex justify-center items-center font-poppins font-semibold md:text-lg leading-normal gap-[18px] h-11 sm:h-14 md:h-[73px] text-white" >
+                <Button onClick={() => navigate("/inventory/new-store")} type="button" buttonClasses="bodyBackground w-fit fade-bottom rounded-[15px] p-2.5 md:py-[26px] md:px-2 lg:px-8 flex justify-center items-center font-poppins font-semibold md:text-lg leading-normal gap-[18px] h-11 sm:h-14 md:h-[73px] text-white" >
                     <div className="sm:w-[21px] sm:h-[21px] w-4 h-4">
                         <img src={registerIcon} alt="date" className="w-full h-full" />
                     </div>

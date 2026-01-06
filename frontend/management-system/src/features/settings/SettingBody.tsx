@@ -98,7 +98,7 @@ export default function SettingBody({
         </div>
         <div className="w-full flex flex-col gap-3 text-white">
           <p className={settingsHead}>Your Password:</p>
-          <div className="flex flex-wrap gap-5 justify-between mt-4 items-center">
+          <div className="flex flex-wrap gap-5 justify-between mt-3.5 items-center">
             <h1 className="text-xl md:text-2xl lg:text-3xl px-7">********</h1>
             <Button onClick={handleChangePassword} buttonClasses="buttonColor px-5 py-4 pb-5 rounded-[10px] text-white text-base md:text-lg lg:text-xl font-inter font-medium lg:leading-[17px] text-center">
               Change Password

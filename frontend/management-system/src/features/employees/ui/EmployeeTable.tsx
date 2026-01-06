@@ -11,7 +11,7 @@ import DeleteModal from "shared/DeleteModal";
 
 
 
-console.log("table")
+console.log("table body")
 
 const EmployeeTable = () => {
     const { employeesList, updateStatus, handleEmployeeDelete, isEmployeeDelete, setIsEmployeeDelete } = useEmployees();

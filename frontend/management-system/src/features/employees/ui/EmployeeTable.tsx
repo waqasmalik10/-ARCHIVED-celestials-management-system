@@ -10,6 +10,9 @@ import StatusModal from "./StatusModal";
 import DeleteModal from "shared/DeleteModal";
 
 
+
+console.log("table")
+
 const EmployeeTable = () => {
     const { employeesList, updateStatus, handleEmployeeDelete, isEmployeeDelete, setIsEmployeeDelete } = useEmployees();
     const navigate = useNavigate();

@@ -32,7 +32,7 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(({
 
     <div
         ref={ref}
-        className={`relative bodyBackground min-w-[500px] rounded-[15px] overflow-hidden transition-opacity duration-500 min-h-[200px] ${modalClassName}`}
+        className={`relative bodyBackground min-w-[300px] w-full max-w-[500px] rounded-[15px] overflow-hidden transition-opacity duration-500 min-h-[200px] max-h-[85%] overflow-y-auto ${modalClassName}`}
       >
         <button onClick={closeButtonCLick} type='button' className='absolute top-6 right-6'>
           <img src={closeIcon} alt='close' />

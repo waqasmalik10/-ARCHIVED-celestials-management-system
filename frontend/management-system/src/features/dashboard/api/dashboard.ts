@@ -206,7 +206,7 @@ export const fetchTransactionData = async (): Promise<TransactionData> => {
 export const fetchEmploeeTableData = async (): Promise<EmployeeListData> => {
   try {
     const response = await fetch(
-      "/dummy_json_data/dashboard_json_data/dashboard-superadmin-json_data/employeelist.json"
+      "/dummy_json_data/employees_json_data/employeeslist.json"
     );
     if (!response.ok) {
       throw new Error(`${response.status}`);

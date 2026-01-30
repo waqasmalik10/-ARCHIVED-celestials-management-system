@@ -20,7 +20,7 @@ export default function FormInput({
       <div className={`relative w-full ${inputMainBorder}`}>
       <input
         {...props}
-        className={`w-full outline-none ${inputClassName}`}
+        className={`w-full outline-none text-sm md:text-base leading-normal ${inputClassName}`}
       />
       </div>
     </div>

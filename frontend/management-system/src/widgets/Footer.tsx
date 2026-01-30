@@ -110,8 +110,8 @@ const Footer = () => {
               </ImageButton>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row items-center sm:items-start  w-full max-w-[400px] mx-auto sm:mx-0 sm:max-w-fit md:max-w-[400px] gap-7 justify-center md:justify-between sm:justify-end">
-            <div className="flex sm:flex-col gap-2.5 items-center sm:items-start flex-wrap">
+          <div className="flex flex-col sm:flex-row items-start  w-full max-w-[400px] mx-auto sm:mx-0 sm:max-w-fit md:max-w-[400px] gap-7 justify-center md:justify-between sm:justify-end">
+            <div className="flex sm:flex-col gap-2.5 items-start flex-wrap">
               <h5
                 className={`text-[#FFFFFF7A] text-base md:text-xl font-inter font-medium leading-normal md:leading-[35px] sm:mb-2.5 transition-all duration-500 ${
                   animationStep >= 7
@@ -162,7 +162,7 @@ const Footer = () => {
                 Carrers
               </Link>
             </div>
-            <div className="flex sm:flex-col gap-2.5 items-center sm:items-start flex-wrap">
+            <div className="flex sm:flex-col gap-2.5 items-start flex-wrap">
               <h5
                 className={`text-[#FFFFFF7A] text-base md:text-xl font-inter font-medium leading-normal md:leading-[35px] sm:mb-2.5 transition-all duration-500 ${
                   animationStep >= 12

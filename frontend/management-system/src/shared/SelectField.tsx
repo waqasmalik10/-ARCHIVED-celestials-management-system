@@ -33,7 +33,7 @@ const SelectField: React.FC<SelectFieldProps> = ({ label, labelClassName, inputC
 
   return (
     <div className="flex flex-col items-start">
-      <label htmlFor={props.name} className={`font-semibold text-white text-[21px] font-urbanist leading-[180%] ${labelClassName}`}>{label}</label>
+      <label htmlFor={props.name} className={`font-semibold text-white text-base md:text-lg lg:text-[21px] font-urbanist lg:leading-[180%] ${labelClassName}`}>{label}</label>
       <select
         {...field}
         {...props}

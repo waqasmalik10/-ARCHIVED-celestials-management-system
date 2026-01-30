@@ -1,13 +1,13 @@
-import os
 import logging
-from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import ValidationError
+
 
 
 # --- Define environment schema ---
 class EnvSchema(BaseSettings):
-    # Database connection URL
-    data_base_url: str \
+    # Database connection
+    data_base_url: str
 
     # JWT configuration
     secret_key: str
@@ -22,7 +22,7 @@ class EnvSchema(BaseSettings):
     )
 
 
-# --- Load environment safely ---
+# --- Strict Loader (fails fast) ---
 def load_environment() -> EnvSchema:
     try:
         # Try loading environment variables
@@ -32,6 +32,12 @@ def load_environment() -> EnvSchema:
         # Fallback in case of validation error
         logging.warning(f"Environment validation failed! Using default values. {e}")
         return EnvSchema()
+    except ValidationError as e:
+        logging.critical("❌ Missing or invalid environment variables!")
+        logging.critical(e)
+        raise SystemExit(
+            "\n🚫 Application stopped. Fix your .env file before running again.\n"
+        )
 
 
 # --- Helper getter functions ---
@@ -59,7 +65,7 @@ def get_token_expire_minutes() -> int:
     return env.access_token_expire_minutes
 
 
-# --- Quick test (optional) ---
+# --- Quick manual test ---
 if __name__ == "__main__":
     # Print environment values for verification
     print(get_database_url())

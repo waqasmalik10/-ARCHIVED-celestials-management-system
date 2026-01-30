@@ -111,9 +111,9 @@ const Form = () => {
         formik.setFieldValue('team', item)
     }
 
-    const labelStyles = "font-urbanist font-semibold text-[21px] leading-[180%] text-white"
+    const labelStyles = "font-urbanist font-semibold text-base md:text-lg lg:text-[21px] lg:leading-[180%] text-white"
     const inputBorder = "inputMainBorder mt-3.5 w-full rounded-[8px]"
-    const inputStyles = "inputBox py-[21px] px-[29px] rounded-[15px] text-white placeholder-[#747681]"
+    const inputStyles = "inputBox text-sm md:text-base leading-normal px-4 py-2.5 lg:py-[21px] lg:px-[29px] rounded-[15px] text-white placeholder-[#747681]"
     const errorClasses = "text-red-500 text-xs mt-1 absolute -bottom-6"
 
     const handleClick = () => {
@@ -269,23 +269,23 @@ const Form = () => {
         <>
             <form onSubmit={formik.handleSubmit} noValidate className="mt-6 flex flex-col gap-[38px]">
                 <div>
-                    <p className="font-urbanist font-medium text-[21px] leading-[180%] text-[#FFFFFF99] mb-[38px]">
+                    <p className="font-urbanist font-medium text-base md:text-lg lg:text-[21px] lg:leading-[180%] text-[#FFFFFF99] mb-[38px]">
                         Image, Video, Audio, or 3D Model. File types supported: JPG, PNG, GIF, SVG, MP4, WEBM, MP3, WAV, OGG, GLB, GLTF. Max size: 100 MB
                     </p>
                     <div>
                         <label className={`${labelStyles}`}>Upload File</label>
-                        <ImageButton type="button" onClick={handleClick} buttonClasses="mt-3.5 border border-dashed border-[#747681] w-full max-w-[484px] min-h-[484px] flex items-center justify-center">
+                        <ImageButton type="button" onClick={handleClick} buttonClasses="mt-3.5 border border-dashed border-[#747681] w-full max-w-[484px] min-h-[300px] lg:min-h-[484px] flex items-center justify-center">
                             {file ? (
                                 <img
                                     src={file}
                                     alt="Uploaded preview"
-                                    className="w-[145px] h-[145px] object-cover rounded-full"
+                                    className="w-[100px] h-[100px] lg:w-[145px] lg:h-[145px] object-cover rounded-full"
                                 />
                             ) : (
                                 <img
                                     src={uploadImg}
                                     alt="profile"
-                                    className="w-[145px] h-[145px] object-cover rounded-full"
+                                    className="w-[100px] h-[100px] lg:w-[145px] lg:h-[145px] object-cover rounded-full"
                                 />
                             )}
 
@@ -300,7 +300,7 @@ const Form = () => {
                     </div>
 
                 </div>
-                <div className="grid md:grid-cols-2 gap-[38px]">
+                <div className="grid md:grid-cols-2 gap-3 md:gap-5 lg:gap-[38px]">
                     <div className="relative">
                         <FormInput id="name"
                             name="name"
@@ -703,7 +703,7 @@ const Form = () => {
 
                     </div>
                 </div>
-                <Button type="submit" disabled={editingEmployee ? !formik.dirty : false} buttonClasses={`min-h-[64px] border border-[#CDD6D7] border-solid bg-[#283573] py-5 px-[75px] rounded-[15px] mt-[58px] text-2xl font-semibold leading-[160%] font-urbanist text-white w-fit ${editingEmployee && !formik.dirty ? 'opacity-50 !cursor-not-allowed' : 'opacity-1 !cursor-pointer'}`}>
+                <Button type="submit" disabled={editingEmployee ? !formik.dirty : false} buttonClasses={`min-h-10 lg:min-h-[64px] border border-[#CDD6D7] border-solid bg-[#283573] py-3 px-2 lg:py-5 lg:px-[75px] rounded-[15px] flex mx-auto lg:mx-0 mt-4 md:mt-[58px] text-base md:text-lg lg:text-2xl font-semibold lg:leading-[160%] font-urbanist text-white min-w-[200px] lg:min-w-auto w-fit ${editingEmployee && !formik.dirty ? 'opacity-50 !cursor-not-allowed' : 'opacity-1 !cursor-pointer'}`}>
                     {editingEmployee ? 'Update' : 'Register'}
                 </Button>
             </form>

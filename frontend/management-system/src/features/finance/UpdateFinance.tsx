@@ -24,16 +24,14 @@ const UpdateFinance = () => {
                 editFinanceData(foundEmployee);
             }
         }
-        return () => {
-            setEditingFinance(null);
-        };
+        return 
     }, [financeList, financeId])
     return (
         <>
-            <ImageButton type="button" onClick={backPgae} className="mt-5">
+            <ImageButton type="button" onClick={backPgae} buttonClasses="mt-5 w-5 h-5 md:w-7 md:h-7">
                 <img src={backImg} alt="back Image" />
             </ImageButton>
-            <h2 className="mt-5 md:mt-[46px] text-[58px] font-semibold font-poppins leading-[140%] text-white">
+            <h2 className="mt-5 md:mt-[46px] text-2xl md:text-3xl lg:text-[58px] font-semibold font-poppins lg:leading-[140%] text-white">
                 Update the Finance
             </h2>
             <Form />

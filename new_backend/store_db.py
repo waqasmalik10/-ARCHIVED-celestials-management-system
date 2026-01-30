@@ -50,8 +50,7 @@ def get_all_stores_in_db(page, page_size, session, current_admin):
     company = session.exec(select(Company).where(Company.company_name == current_admin.company_name)).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company Doesn't Found for Admin")
-    query = select(Store).where(Store.company_id == company.company_id)
-    all_stores = session.exec(query).all()
+    all_stores = session.exec(select(Store).where(Store.company_id == company.company_id)).all()
     total_count = len(all_stores)
 
     # Paginate results

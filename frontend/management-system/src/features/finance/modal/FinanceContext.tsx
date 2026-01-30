@@ -14,7 +14,7 @@ export interface FinanceTableData {
 }
 
 export interface FinanceCategoriesData {
-  id?: number,
+  id?: string,
   name?: string,
   colorCode?: string,
   companyId?: number
@@ -24,17 +24,26 @@ interface FinanceContextType {
   financeList: FinanceTableData[];
   financeCategoriesList: FinanceCategoriesData[];
   setEditingFinance: (fin: FinanceTableData | null) => void;
+  setEditingCategory: (category: FinanceCategoriesData | null) => void;
   addFinance: (finance: FinanceTableData) => boolean;
+  addCategory: (category: FinanceCategoriesData) => boolean;
   editingFinance: FinanceTableData | null;
+  editingCategory: FinanceCategoriesData | null;
   idExistError: string;
   clearError: () => void;
   successfullModal: boolean;
   setSuccessfullModal: (value: boolean) => void;
   updateFinance: (fin: FinanceTableData) => void;
   editFinanceData: (fin: FinanceTableData) => void;
+  updateFinanceCategory: (cate: FinanceCategoriesData) => void;
+  editCategoryData: (cate: FinanceCategoriesData) => void;
   isDeleteModal: FinanceTableData | null
   setIsDeleteModal: (fin: FinanceTableData | null) => void
-  handleFinanceDelete:(finance: FinanceTableData) => void;
+  isDeleteCategoryModal: FinanceCategoriesData | null
+  setIsDeleteCategoryModal: (cate: FinanceCategoriesData | null) => void
+
+  handleFinanceDelete: (finance: FinanceTableData) => void;
+  handleCategoryDelete: (category: FinanceCategoriesData) => void;
 }
 
 
@@ -59,6 +68,8 @@ export const FinanceProvider: React.FC<FinanceProviderProps> = ({ children }) =>
   const [editingFinance, setEditingFinance] = useState<FinanceTableData | null>(null);
   const [successfullModal, setSuccessfullModal] = useState<boolean>(false)
   const [isDeleteModal, setIsDeleteModal] = useState<FinanceTableData | null>(null);
+  const [isDeleteCategoryModal, setIsDeleteCategoryModal] = useState<FinanceCategoriesData | null>(null)
+  const [editingCategory, setEditingCategory] = useState<FinanceCategoriesData | null>(null)
 
   useEffect(() => {
     const loadFinance = async () => {
@@ -83,10 +94,6 @@ export const FinanceProvider: React.FC<FinanceProviderProps> = ({ children }) =>
     loadFinance();
 
   }, []);
-
-  // const isDuplicateId = (id?: string) => {
-  //   return id ? financeList.some((finance) => finance.FinanceId === id) : false;
-  // }
 
   const addFinance = (finance: FinanceTableData) => {
 
@@ -127,14 +134,57 @@ export const FinanceProvider: React.FC<FinanceProviderProps> = ({ children }) =>
     const updatingList = financeList.filter(i => i.FinanceId !== finance.FinanceId)
     setFinanceList(updatingList)
     setIsDeleteModal(null)
+    window.scrollTo(0, 0);
+    document.body.style.overflow = "auto"
   }
 
+  const addCategory = (category: FinanceCategoriesData) => {
+
+    const updatedCategoryList = [...financeCategoriesList, category];
+    console.log("added")
+    setFinanceCategoriesList(updatedCategoryList);
+    setEditingCategory(null)
+    setIdExistError("")
+    setSuccessfullModal(true)
+    window.scrollTo(0, 0);
+    document.body.style.overflow = "hidden"
+    return true
+
+  };
+
+  const editCategoryData = (category: FinanceCategoriesData) => {
+    console.log(category)
+    setEditingCategory(category);
+    setSuccessfullModal(false);
+    document.body.style.overflow = "auto";
+    window.scrollTo(0, 0);
+  };
+
+  const updateFinanceCategory = (updatedCategory: FinanceCategoriesData) => {
+
+    const updatedList = financeCategoriesList.map((cate) =>
+      cate.id === updatedCategory.id ? updatedCategory : cate
+    );
+    console.log("updateList", updatedList)
+    setFinanceCategoriesList(updatedList);
+    setSuccessfullModal(true);
+    document.body.style.overflow = "hidden";
+    window.scrollTo(0, 0);
+    setIdExistError("");
+  };
+  const handleCategoryDelete = (category: FinanceCategoriesData) => {
+    const updatingList = financeCategoriesList.filter(c => c.id !== category.id)
+    setFinanceCategoriesList(updatingList)
+    setIsDeleteCategoryModal(null)
+    window.scrollTo(0, 0);
+    document.body.style.overflow = "auto"
+  }
 
   const clearError = () => setIdExistError("");
 
 
   return (
-    <FinanceContext.Provider value={{ financeList, addFinance, clearError, idExistError, successfullModal, setSuccessfullModal, editingFinance, editFinanceData, updateFinance, setEditingFinance, isDeleteModal, setIsDeleteModal, handleFinanceDelete, financeCategoriesList }}>
+    <FinanceContext.Provider value={{ financeList, addFinance, clearError, idExistError, successfullModal, setSuccessfullModal, editingFinance, editFinanceData, updateFinance, setEditingFinance, isDeleteModal, setIsDeleteModal, handleFinanceDelete, financeCategoriesList, editCategoryData, editingCategory, setEditingCategory, addCategory, updateFinanceCategory, isDeleteCategoryModal, setIsDeleteCategoryModal, handleCategoryDelete }}>
       {children}
     </FinanceContext.Provider>
   );

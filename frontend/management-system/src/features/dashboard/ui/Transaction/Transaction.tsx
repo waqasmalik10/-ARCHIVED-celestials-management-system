@@ -145,7 +145,7 @@ const Transaction = () => {
           <table className="w-full min-w-[1024px]">
             <thead>
               <tr className="">
-                <th className="py-3 md:py-[19px] text-base md:text-lg font-inter font-medium leading-normal md:leading-[30px] text-[#FFFFFF7A] w-[48.08%] text-left pl-[109px]">
+                <th className="py-3 md:py-[19px] text-base md:text-lg font-inter font-medium leading-normal md:leading-[30px] text-[#FFFFFF7A] w-[48.08%] text-left pl-5 md:pl-10 lg:pl-[109px]">
                   Name
                 </th>
                 <th className="py-3 md:py-[19px] text-base md:text-lg font-inter font-medium leading-normal md:leading-[30px] text-[#FFFFFF7A] w-[8.66%] pl-3 pr-10 text-right">

@@ -8,4 +8,4 @@ const Settings = () => {
     )
 }
 
-export default Setting
+export default Settings

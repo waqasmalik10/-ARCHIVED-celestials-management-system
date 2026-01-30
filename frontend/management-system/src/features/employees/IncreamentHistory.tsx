@@ -30,26 +30,26 @@ const IncreamentHistory = () => {
     }, [employeesList, employeeId])
 
     const handleAddIncreamentModal = () => {
-        setAddIncreamentModalOpen(!addIncreamentModalOpen)
-        if (addIncreamentModalOpen) {
-            window.scrollTo(0, 0);
-            document.body.style.overflow = "auto"
-        } else {
-            window.scrollTo(0, 0);
-            document.body.style.overflow = "hidden"
-        }
+        setAddIncreamentModalOpen(true)
+       window.scrollTo(0, 0);
+        document.body.style.overflow = "hidden"
+    }
+    const handleCloseIncreamentModal = () => {
+        setAddIncreamentModalOpen(false)
+        window.scrollTo(0, 0);
+        document.body.style.overflow = "auto"
     }
 
     return (
         <>
-            <ImageButton type="button" onClick={backPgae} className="mt-5">
+            <ImageButton type="button" onClick={backPgae} buttonClasses="mt-5 w-5 h-5 md:w-7 md:h-7">
                 <img src={backImg} alt="back Image" />
             </ImageButton>
-            <h2 className="mt-5 md:mt-[46px] text-[58px] font-semibold font-poppins leading-[140%] text-white">
+            <h2 className="mt-5 md:mt-[46px] text-2xl md:text-3xl lg:text-[58px] font-semibold font-poppins lg:leading-[140%] text-white">
                 Increament History
             </h2>
-            <div className="flex justify-between items-center">
-                <p className="text-[21px] font-medium font-urbanist leading-[180%] mt-6 text-[#FFFFFF99]">
+            <div className="flex justify-between items-center mt-6">
+                <p className="text-base md:text-lg lg:text-[21px] font-medium font-urbanist lg:leading-[180%] text-[#FFFFFF99]">
                     Employee Id is <span className="font-semibold">{employeeId}</span>
                 </p>
                 <Button onClick={handleAddIncreamentModal} buttonClasses="bodyBackground h-12 px-4 py-3 font-inter font-medium text-base sm:text-lg md:text-xl leading-normal text-white whitespace-nowrap rounded-[15px]">
@@ -58,7 +58,7 @@ const IncreamentHistory = () => {
             </div>
             <IncrementHistoryTable />
             {addIncreamentModalOpen &&
-                <IncrementModalForm addIncrement={addNewIncrement} closeModal={handleAddIncreamentModal} />
+                <IncrementModalForm addIncrement={addNewIncrement} closeModal={handleCloseIncreamentModal} />
             }
         </>
     )
